@@ -52,6 +52,10 @@ int main(int argc, char *argv[]){
 
     //TODO:  #1. WHY IS THIS SAFE, aka what if arv[1] does not exist?
     //      PLACE A COMMENT BLOCK HERE EXPLAINING
+    //      The code below is safe because if arv[1] does not exist or does not contain the - symbol character
+    //      it will result into an error and the code will result into an error, this is safe due to the fact that
+    //      this will prevent a segmentation fault with the source code and will prevent from accessing data from
+    //      a non-existent area in memory.
     if ((argc < 2) || (*argv[1] != '-')){
         usage(argv[0]);
         exit(1);
