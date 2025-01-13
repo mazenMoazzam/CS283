@@ -3,7 +3,8 @@
 #include <stdlib.h>
 
 
-#define BUFFER_SZ 50
+#define BUFFER_SZ 
+
 
 //prototypes
 void usage(char *);
@@ -17,6 +18,7 @@ int  count_words(char *, int, int);
 
 int setup_buff(char *buff, char *user_str, int len){
     //TODO: #4:  Implement the setup buff as per the directions
+    
     return 0; //for now just so the code compiles. 
 }
 
