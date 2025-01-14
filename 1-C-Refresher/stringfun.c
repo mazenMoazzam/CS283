@@ -16,7 +16,7 @@ int  count_words(char *, int, int);
 //add additional prototypes here
 int getLengthOfString(char* buff, int totalLength);
 void reverse(char* buff, int strLen);
-
+void wordPrint(char* buff, int strLen);
 
 int setup_buff(char *buff, char *user_str, int len){
     //TODO: #4:  Implement the setup buff as per the directions
@@ -100,6 +100,74 @@ void reverse(char* buff, int strLen) {
     	printf("\n");
 
 }
+/*
+void wordPrint(char* buff, int strLen) {
+	int wordCount = 0;
+	int inWordCount = 0;
+	int start = 0;
+
+	printf("Word Print\n----------\n");
+
+	for (int i = 0; i < strLen; i++) {
+		char currentCharacter = buff[i];
+
+		if (currentCharacter != ' ' && currentCharacter != '.') {
+			if (!inWordCount) {
+				inWordCount = 1;
+				start = i;
+			}
+		} else if ((currentCharacter == ' ' || currentCharacter == '.' || i == strLen - 1) && inWordCount) {
+			inWordCount = 0;
+			int wordLength = i - start;
+
+			if (i == strLen - 1 && currentCharacter != ' ' && currentCharacter != '.') {
+				wordLength++;
+			}
+			printf("%d. ", ++wordCount);
+
+			for (int j = start; j < start + wordLength; j++) {
+				putchar(buff[j]);
+			}
+			printf(" (%d)\n", wordLength);
+		}
+	}
+}
+*/
+
+
+void wordPrint(char* buff, int strLen) {
+    int wordCount = 0;
+    int inWord = 0;
+    int start = 0;
+
+    printf("Word Print\n----------\n");
+
+    for (int i = 0; i < strLen; i++) {
+        char currentCharacter = buff[i];
+
+      
+        if (currentCharacter != ' ' && currentCharacter != '.') {
+            if (!inWord) {
+                inWord = 1;
+                start = i; 
+            }
+        }
+
+        if ((currentCharacter == ' ' || currentCharacter == '.' || i == strLen - 1) && inWord) {
+            inWord = 0;
+            int wordLength = i - start;
+            if (currentCharacter != ' ' && currentCharacter != '.' && i == strLen - 1) {
+                wordLength++;
+            }
+
+            printf("%d. ", ++wordCount);
+            for (int j = start; j < start + wordLength; j++) {
+                putchar(buff[j]);
+            }
+            printf(" (%d)\n", wordLength);
+        }
+    }
+}
 
 int main(int argc, char *argv[]){
 
@@ -109,7 +177,7 @@ int main(int argc, char *argv[]){
     int  rc;                //used for return codes
     int  user_str_len;      //length of user supplied string
 
-    //TODO:  #1. WHY IS THIS SAFE, aka what if arv[1] does not exist?
+    //TDO:  #1. WHY IS THIS SAFE, aka what if arv[1] does not exist?
     //      PLACE A COMMENT BLOCK HERE EXPLAINING
     //      The code below is safe because if arv[1] does not exist or does not contain the - symbol character
     //      it will result into an error and the code will result into an error, this is safe due to the fact that
@@ -170,8 +238,12 @@ int main(int argc, char *argv[]){
         //       the case statement options
 	case 'r':
 	    user_str_len = getLengthOfString(buff, user_str_len);
-	    reverse(buff, user_str_len);
-
+	    char* tempBuff = buff;
+	    reverse(tempBuff, user_str_len);
+	    break;
+	case 'w':
+	    user_str_len = getLengthOfString(buff, user_str_len);
+	    wordPrint(buff, user_str_len);
 	    break;
         default:
             usage(argv[0]);
