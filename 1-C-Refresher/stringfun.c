@@ -18,29 +18,29 @@ void wordPrint(char* buff, int strLen);
 
 int setup_buff(char *buff, char *user_str, int len){
     //TODO: #4:  Implement the setup buff as per the directions
-    int i = 0;
-    int bufferIndex = 0;
+    char* ptrBuff = buff;
+    const char *ptrUserStr = user_str; 
     char lastCharacter = 0;
-    
-    while (user_str[i] != '\0' && bufferIndex < len) {
-	    if (user_str[i] != ' ' && user_str[i] != '\t') {
-	    	buff[bufferIndex++] = user_str[i];
-	    	lastCharacter = user_str[i];
-	    } else if ((lastCharacter != ' ' && lastCharacter != 0) && bufferIndex > 0) {
-		    buff[bufferIndex++] = ' ';
+   
+    while (*ptrUserStr != '\0' && (ptrBuff - buff) < len) {
+	    if (*ptrUserStr != ' ' && *ptrUserStr != '\t') {
+	    	*ptrBuff++ = *ptrUserStr;
+	    	lastCharacter = *ptrUserStr;
+	    } else if ((lastCharacter != ' ' && lastCharacter != 0) && (ptrBuff - buff) > 0) {
+		    *ptrBuff = ' ';
 		    lastCharacter = ' ';
 	    }
-	    i++;
+	    ptrUserStr++;
     }
 
-    if (user_str[i] != '\0') {
+    if (*ptrUserStr != '\0') {
 	    return -1;
     }
 
-    while(bufferIndex < len) { 
-	    buff[bufferIndex++] = '.';
+    while((ptrBuff - buff) < len) { 
+	    *ptrBuff = '.';
     }
-    return i; //for now just so the code compiles. 
+    return (ptrBuff - buff); //for now just so the code compiles. 
 }
 
 
@@ -62,11 +62,14 @@ void usage(char *exename){
 int count_words(char *buff, int len, int str_len){
     int wordCount = 0;
     int endOfWord = 0;
-    for (int i = 0; i < str_len; i++) {
-	    if ((buff [i] != ' ' && buff[i] != '.') && !endOfWord) {
+    char* ptrBuff = buff;
+
+
+    for (int i = 0; i < str_len; i++, ptrBuff++) {
+	    if ((*ptrBuff != ' ' && *ptrBuff != '.') && !endOfWord) {
 		    endOfWord = 1;
 		    wordCount++;
-	    } else if (buff[i] == ' ' || buff[i] == '.') {
+	    } else if (*ptrBuff == ' ' || *ptrBuff == '.') {
 		    endOfWord = 0;
 	    }
     }
@@ -87,15 +90,19 @@ int getLengthOfString(char* buff, int totalLength) {
 
 void reverse(char* buff, int strLen) {
 	char temp;
-	for (int i = 0; i < strLen / 2; i++) {
-		temp = buff[i];
-		buff[i] = buff[strLen - 1 - i];
-		buff[strLen - 1 - i] = temp;
+	char* left = buff;
+	char* right = buff + strLen - 1;
+
+	while (left < right) {
+		temp = *left;
+		*left = *right;
+		*right = temp;
+		left++;
+		right--;
 	}
 	printf("Reversed: ");
-	for (int i = 0; i < strLen; i++) {
-        	if (buff[i] == '.') break;
-        	putchar(buff[i]);
+	for (char* p =  buff; *p != '.' && (p - buff) < strLen; p++) {
+        	putchar(*p);
     	}
     	printf("\n");
 }
