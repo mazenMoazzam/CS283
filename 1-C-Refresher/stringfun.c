@@ -59,8 +59,19 @@ void usage(char *exename){
 }
 
 int count_words(char *buff, int len, int str_len){
-    //YOU MUST IMPLEMENT
-    return 0;
+    int wordCount = 0;
+    int endOfWord = 0;
+
+
+    for (int i = 0; i < str_len; i++) {
+	    if ((buff [i] != ' ' && buff[i] != '.') && !endOfWord) {
+		    endOfWord = 1;
+		    wordCount++;
+	    } else if (buff[i] == ' ' || buff[i] == '.') {
+		    endOfWord = 0;
+	    }
+    }
+    return wordCount;
 }
 
 //ADD OTHER HELPER FUNCTIONS HERE FOR OTHER REQUIRED PROGRAM OPTIONS
@@ -120,7 +131,6 @@ int main(int argc, char *argv[]){
         exit(2);
     }
 
-    /*
     switch (opt){
         case 'c':
             rc = count_words(buff, BUFFER_SZ, user_str_len);  //you need to implement
@@ -137,7 +147,7 @@ int main(int argc, char *argv[]){
             usage(argv[0]);
             exit(1);
     }
-    */
+
 
     //TODO:  #6 Dont forget to free your buffer before exiting
     print_buff(buff,BUFFER_SZ);
