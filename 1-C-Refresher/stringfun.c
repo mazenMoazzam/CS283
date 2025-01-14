@@ -94,13 +94,13 @@ int getLengthOfString(char* buff, int totalLength) {
 void reverse(char* buff, int strLen) {
 	printf("Reversed: ");
 	char* endOfBuff = buff + strLen - 1;
-
 	while(endOfBuff >= buff) {
 		putchar(*endOfBuff);
 		endOfBuff--;
 	}
 	printf("\n");
 }
+
 
 void wordPrint(char* buff, int strLen) {
     int wordNum = 1;  
