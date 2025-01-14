@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-
 #define BUFFER_SZ 50 
 
 
@@ -10,7 +8,6 @@
 void usage(char *);
 void print_buff(char *, int);
 int  setup_buff(char *, char *, int);
-
 //prototypes for functions to handle required functionality
 int  count_words(char *, int, int);
 //add additional prototypes here
@@ -43,10 +40,8 @@ int setup_buff(char *buff, char *user_str, int len){
     while(bufferIndex < len) { 
 	    buff[bufferIndex++] = '.';
     }
-
     return i; //for now just so the code compiles. 
 }
-
 
 
 void print_buff(char *buff, int len){
@@ -57,9 +52,9 @@ void print_buff(char *buff, int len){
     putchar('\n');
 }
 
+
 void usage(char *exename){
     printf("usage: %s [-h|c|r|w|x] \"string\" [other args]\n", exename);
-
 }
 
 
@@ -67,8 +62,6 @@ void usage(char *exename){
 int count_words(char *buff, int len, int str_len){
     int wordCount = 0;
     int endOfWord = 0;
-
-
     for (int i = 0; i < str_len; i++) {
 	    if ((buff [i] != ' ' && buff[i] != '.') && !endOfWord) {
 		    endOfWord = 1;
@@ -92,7 +85,6 @@ int getLengthOfString(char* buff, int totalLength) {
 }
 
 
-
 void reverse(char* buff, int strLen) {
 	char temp;
 	for (int i = 0; i < strLen / 2; i++) {
@@ -101,13 +93,11 @@ void reverse(char* buff, int strLen) {
 		buff[strLen - 1 - i] = temp;
 	}
 	printf("Reversed: ");
-	
 	for (int i = 0; i < strLen; i++) {
         	if (buff[i] == '.') break;
         	putchar(buff[i]);
     	}
     	printf("\n");
-
 }
 
 
@@ -115,13 +105,9 @@ void wordPrint(char* buff, int strLen) {
     int wordCount = 0;
     int inWord = 0;
     int start = 0;
-
     printf("Word Print\n----------\n");
-
     for (int i = 0; i < strLen; i++) {
         char currentCharacter = buff[i];
-
-      
         if (currentCharacter != ' ' && currentCharacter != '.') {
             if (!inWord) {
                 inWord = 1;
@@ -145,8 +131,9 @@ void wordPrint(char* buff, int strLen) {
     }
 }
 
-int main(int argc, char *argv[]){
 
+
+int main(int argc, char *argv[]){
     char *buff;             //placehoder for the internal buffer
     char *input_string;     //holds the string provided by the user on cmd line
     char opt;               //used to capture user option from cmd line
@@ -225,7 +212,6 @@ int main(int argc, char *argv[]){
             usage(argv[0]);
             exit(1);
     }
-
 
     //TODO:  #6 Dont forget to free your buffer before exiting
     print_buff(buff,BUFFER_SZ);
