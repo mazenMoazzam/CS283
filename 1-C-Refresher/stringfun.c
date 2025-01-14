@@ -18,6 +18,7 @@ int getLengthOfString(char* buff, int totalLength);
 void reverse(char* buff, int strLen);
 void wordPrint(char* buff, int strLen);
 
+
 int setup_buff(char *buff, char *user_str, int len){
     //TODO: #4:  Implement the setup buff as per the directions
     int i = 0;
@@ -46,6 +47,8 @@ int setup_buff(char *buff, char *user_str, int len){
     return i; //for now just so the code compiles. 
 }
 
+
+
 void print_buff(char *buff, int len){
     printf("Buffer:  ");
     for (int i=0; i<len; i++){
@@ -58,6 +61,8 @@ void usage(char *exename){
     printf("usage: %s [-h|c|r|w|x] \"string\" [other args]\n", exename);
 
 }
+
+
 
 int count_words(char *buff, int len, int str_len){
     int wordCount = 0;
@@ -75,6 +80,8 @@ int count_words(char *buff, int len, int str_len){
     return wordCount;
 }
 
+
+
 //ADD OTHER HELPER FUNCTIONS HERE FOR OTHER REQUIRED PROGRAM OPTIONS
 int getLengthOfString(char* buff, int totalLength) {
 	int len = 0;
@@ -83,6 +90,8 @@ int getLengthOfString(char* buff, int totalLength) {
 	}
 	return len;
 }
+
+
 
 void reverse(char* buff, int strLen) {
 	char temp;
@@ -100,39 +109,6 @@ void reverse(char* buff, int strLen) {
     	printf("\n");
 
 }
-/*
-void wordPrint(char* buff, int strLen) {
-	int wordCount = 0;
-	int inWordCount = 0;
-	int start = 0;
-
-	printf("Word Print\n----------\n");
-
-	for (int i = 0; i < strLen; i++) {
-		char currentCharacter = buff[i];
-
-		if (currentCharacter != ' ' && currentCharacter != '.') {
-			if (!inWordCount) {
-				inWordCount = 1;
-				start = i;
-			}
-		} else if ((currentCharacter == ' ' || currentCharacter == '.' || i == strLen - 1) && inWordCount) {
-			inWordCount = 0;
-			int wordLength = i - start;
-
-			if (i == strLen - 1 && currentCharacter != ' ' && currentCharacter != '.') {
-				wordLength++;
-			}
-			printf("%d. ", ++wordCount);
-
-			for (int j = start; j < start + wordLength; j++) {
-				putchar(buff[j]);
-			}
-			printf(" (%d)\n", wordLength);
-		}
-	}
-}
-*/
 
 
 void wordPrint(char* buff, int strLen) {
@@ -210,7 +186,7 @@ int main(int argc, char *argv[]){
 
     if (buff == NULL) {
 	    printf("Memory allocation failed");
-	    return 99;
+	    exit(99);
     }
     //TODO:  #3 Allocate space for the buffer using malloc and
     //          handle error if malloc fails by exiting with a 
