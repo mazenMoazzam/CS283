@@ -107,11 +107,11 @@ void reverse(char* buff, int strLen) {
     	printf("\n");
 }
 
-
+/*
 void wordPrint(char* buff, int strLen) {
     int wordCount = 0;
     int inWord = 0;
-    int start = 0;
+    char* start = NULL;
     printf("Word Print\n----------\n");
     for (int i = 0; i < strLen; i++) {
         char currentCharacter = buff[i];
@@ -134,6 +134,33 @@ void wordPrint(char* buff, int strLen) {
                 putchar(buff[j]);
             }
             printf(" (%d)\n", wordLength);
+        }
+    }
+}
+*/
+
+
+void wordPrint(char* buff, int strLen) {
+    int wordCount = 0;
+    int inWord = 0;
+    char *start = NULL;
+    printf("Word Print\n----------\n");
+
+    for (char *p = buff; p < buff + strLen; p++) {
+        if (*p != ' ' && *p != '.') {
+            if (!inWord) {
+                inWord = 1;
+                start = p;
+            }
+        }
+
+        if ((*p == ' ' || *p == '.' || p == buff + strLen - 1) && inWord) {
+            inWord = 0;
+            printf("%d. ", ++wordCount);
+            for (char *q = start; q <= p; q++) {
+                putchar(*q);
+            }
+            printf(" (%ld)\n", p - start + 1);
         }
     }
 }
