@@ -26,8 +26,8 @@ int setup_buff(char *buff, char *user_str, int len){
 	    if (*ptrUserStr != ' ' && *ptrUserStr != '\t') {
 	    	*ptrBuff++ = *ptrUserStr;
 	    	lastCharacter = *ptrUserStr;
-	    } else if ((lastCharacter != ' ' && lastCharacter != 0) && (ptrBuff - buff) > 0) {
-		    *ptrBuff = ' ';
+	    } else if (lastCharacter != ' ' && lastCharacter != 0) {
+		    *ptrBuff++ = ' ';
 		    lastCharacter = ' ';
 	    }
 	    ptrUserStr++;
@@ -38,7 +38,7 @@ int setup_buff(char *buff, char *user_str, int len){
     }
 
     while((ptrBuff - buff) < len) { 
-	    *ptrBuff = '.';
+	    *ptrBuff++ = '.';
     }
     return (ptrBuff - buff); //for now just so the code compiles. 
 }
@@ -81,10 +81,13 @@ int count_words(char *buff, int len, int str_len){
 //ADD OTHER HELPER FUNCTIONS HERE FOR OTHER REQUIRED PROGRAM OPTIONS
 int getLengthOfString(char* buff, int totalLength) {
 	int len = 0;
-	while (len < totalLength && buff[len] != '.') {
+	char* currentChar = buff;
+	while ((currentChar - buff) > totalLength && *currentChar != '.') {
+		currentChar++;
 		len++;
 	}
 	return len;
+
 }
 
 
@@ -104,64 +107,45 @@ void reverse(char* buff, int strLen) {
 	for (char* p =  buff; *p != '.' && (p - buff) < strLen; p++) {
         	putchar(*p);
     	}
-    	printf("\n");
+	printf("\n");
+
 }
 
-/*
 void wordPrint(char* buff, int strLen) {
-    int wordCount = 0;
-    int inWord = 0;
-    char* start = NULL;
-    printf("Word Print\n----------\n");
-    for (int i = 0; i < strLen; i++) {
-        char currentCharacter = buff[i];
-        if (currentCharacter != ' ' && currentCharacter != '.') {
-            if (!inWord) {
-                inWord = 1;
-                start = i; 
+    int wordNum = 1;  
+    char* start = buff;  
+    char* current = buff;  
+    int wordLen = 0;  
+
+    printf("Word Print\n");
+    printf("----------\n");
+
+    while (current - buff < strLen) {
+        if ((*current != ' ' && *current != '.' && *current != '\0')) {
+            if (wordLen == 0) { 
+                start = current; 
+            }
+            wordLen++;  
+        } else {
+            if (wordLen > 0) {
+                printf("%d. ", wordNum++);
+                while (start != current) {
+                    putchar(*start);
+                    start++;
+                }
+                printf(" (%d)\n", wordLen);  
+                wordLen = 0;
             }
         }
-
-        if ((currentCharacter == ' ' || currentCharacter == '.' || i == strLen - 1) && inWord) {
-            inWord = 0;
-            int wordLength = i - start;
-            if (currentCharacter != ' ' && currentCharacter != '.' && i == strLen - 1) {
-                wordLength++;
-            }
-
-            printf("%d. ", ++wordCount);
-            for (int j = start; j < start + wordLength; j++) {
-                putchar(buff[j]);
-            }
-            printf(" (%d)\n", wordLength);
-        }
+        current++; 
     }
-}
-*/
-
-
-void wordPrint(char* buff, int strLen) {
-    int wordCount = 0;
-    int inWord = 0;
-    char *start = NULL;
-    printf("Word Print\n----------\n");
-
-    for (char *p = buff; p < buff + strLen; p++) {
-        if (*p != ' ' && *p != '.') {
-            if (!inWord) {
-                inWord = 1;
-                start = p;
-            }
+    if (wordLen > 0) {
+        printf("%d. ", wordNum);
+        while (start != current) {
+            putchar(*start);
+            start++;
         }
-
-        if ((*p == ' ' || *p == '.' || p == buff + strLen - 1) && inWord) {
-            inWord = 0;
-            printf("%d. ", ++wordCount);
-            for (char *q = start; q <= p; q++) {
-                putchar(*q);
-            }
-            printf(" (%ld)\n", p - start + 1);
-        }
+        printf(" (%d)\n", wordLen);
     }
 }
 
@@ -267,4 +251,4 @@ int main(int argc, char *argv[]){
 //          is a good practice, after all we know from main() that 
 //          the buff variable will have exactly 50 bytes?
 //  
-//          PLACE YOUR ANSWER HERE
+//          PLACE YOUR ANSWER HERE---
