@@ -163,6 +163,14 @@ int main(int argc, char *argv[]){
 
     //TODO:  #2 Document the purpose of the if statement below
     //      PLACE A COMMENT BLOCK HERE EXPLAINING
+    //      The purpose of the if statement below is to check if the correct number of command line arguments
+    //      were provided by the user and their input. The if-statement check is to ensure the program behaves
+    //      as it is suppose to and for all neccessary inputs for the program, it behaves and operates correctly. 
+    //      The less than 3 means the minimum number of arguments for the program to execute correctly is three.
+    //      If user doesn't provide the correct number of arguments, the program calls the usage function to display
+    //      how to use the program or other helpful information to get the correct input. After this, it exits with
+    //      a status code of 1, which indicates it ended with an error (missing x number of arguments etc.).
+    
     if (argc < 3){
         usage(argv[0]);
         exit(1);
