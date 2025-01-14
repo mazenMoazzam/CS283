@@ -82,7 +82,7 @@ int count_words(char *buff, int len, int str_len){
 int getLengthOfString(char* buff, int totalLength) {
 	int len = 0;
 	char* currentChar = buff;
-	while ((currentChar - buff) > totalLength && *currentChar != '.') {
+	while ((currentChar - buff) < totalLength && *currentChar != '.') {
 		currentChar++;
 		len++;
 	}
