@@ -14,6 +14,8 @@ int  setup_buff(char *, char *, int);
 //prototypes for functions to handle required functionality
 int  count_words(char *, int, int);
 //add additional prototypes here
+int getLengthOfString(char* buff, int totalLength);
+void reverse(char* buff, int strLen);
 
 
 int setup_buff(char *buff, char *user_str, int len){
@@ -43,7 +45,6 @@ int setup_buff(char *buff, char *user_str, int len){
 
     return i; //for now just so the code compiles. 
 }
-
 
 void print_buff(char *buff, int len){
     printf("Buffer:  ");
@@ -75,6 +76,30 @@ int count_words(char *buff, int len, int str_len){
 }
 
 //ADD OTHER HELPER FUNCTIONS HERE FOR OTHER REQUIRED PROGRAM OPTIONS
+int getLengthOfString(char* buff, int totalLength) {
+	int len = 0;
+	while (len < totalLength && buff[len] != '.') {
+		len++;
+	}
+	return len;
+}
+
+void reverse(char* buff, int strLen) {
+	char temp;
+	for (int i = 0; i < strLen / 2; i++) {
+		temp = buff[i];
+		buff[i] = buff[strLen - 1 - i];
+		buff[strLen - 1 - i] = temp;
+	}
+	printf("Reversed: ");
+	
+	for (int i = 0; i < strLen; i++) {
+        	if (buff[i] == '.') break;
+        	putchar(buff[i]);
+    	}
+    	printf("\n");
+
+}
 
 int main(int argc, char *argv[]){
 
@@ -143,6 +168,11 @@ int main(int argc, char *argv[]){
 
         //TODO:  #5 Implement the other cases for 'r' and 'w' by extending
         //       the case statement options
+	case 'r':
+	    user_str_len = getLengthOfString(buff, user_str_len);
+	    reverse(buff, user_str_len);
+
+	    break;
         default:
             usage(argv[0]);
             exit(1);
@@ -151,6 +181,7 @@ int main(int argc, char *argv[]){
 
     //TODO:  #6 Dont forget to free your buffer before exiting
     print_buff(buff,BUFFER_SZ);
+    free(buff);
     exit(0);
 }
 
