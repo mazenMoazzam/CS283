@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 
-#define BUFFER_SZ 
+#define BUFFER_SZ 50 
 
 
 //prototypes
@@ -18,9 +18,32 @@ int  count_words(char *, int, int);
 
 int setup_buff(char *buff, char *user_str, int len){
     //TODO: #4:  Implement the setup buff as per the directions
+    int i = 0;
+    int bufferIndex = 0;
+    char lastCharacter = 0;
     
-    return 0; //for now just so the code compiles. 
+    while (user_str[i] != '\0' && bufferIndex < len) {
+	    if (user_str[i] != ' ' && user_str[i] != '\t') {
+	    	buff[bufferIndex++] = user_str[i];
+	    	lastCharacter = user_str[i];
+	    } else if ((lastCharacter != ' ' && lastCharacter != 0) && bufferIndex > 0) {
+		    buff[bufferIndex++] = ' ';
+		    lastCharacter = ' ';
+	    }
+	    i++;
+    }
+
+    if (user_str[i] != '\0') {
+	    return -1;
+    }
+
+    while(bufferIndex < len) { 
+	    buff[bufferIndex++] = '.';
+    }
+
+    return i; //for now just so the code compiles. 
 }
+
 
 void print_buff(char *buff, int len){
     printf("Buffer:  ");
@@ -79,7 +102,12 @@ int main(int argc, char *argv[]){
     }
 
     input_string = argv[2]; //capture the user input string
+    buff = malloc(BUFFER_SZ * sizeof(char));
 
+    if (buff == NULL) {
+	    printf("Memory allocation failed");
+	    return 99;
+    }
     //TODO:  #3 Allocate space for the buffer using malloc and
     //          handle error if malloc fails by exiting with a 
     //          return code of 99
@@ -92,6 +120,7 @@ int main(int argc, char *argv[]){
         exit(2);
     }
 
+    /*
     switch (opt){
         case 'c':
             rc = count_words(buff, BUFFER_SZ, user_str_len);  //you need to implement
@@ -108,6 +137,7 @@ int main(int argc, char *argv[]){
             usage(argv[0]);
             exit(1);
     }
+    */
 
     //TODO:  #6 Dont forget to free your buffer before exiting
     print_buff(buff,BUFFER_SZ);
