@@ -45,7 +45,7 @@ int setup_buff(char *buff, char *user_str, int len){
 
 
 void print_buff(char *buff, int len){
-    printf("Buffer:  ");
+    printf("Buffer: ");
     for (int i=0; i<len; i++){
         putchar(*(buff+i));
     }
@@ -92,23 +92,14 @@ int getLengthOfString(char* buff, int totalLength) {
 
 
 void reverse(char* buff, int strLen) {
-	char temp;
-	char* left = buff;
-	char* right = buff + strLen - 1;
-
-	while (left < right) {
-		temp = *left;
-		*left = *right;
-		*right = temp;
-		left++;
-		right--;
-	}
 	printf("Reversed: ");
-	for (char* p =  buff; *p != '.' && (p - buff) < strLen; p++) {
-        	putchar(*p);
-    	}
-	printf("\n");
+	char* endOfBuff = buff + strLen - 1;
 
+	while(endOfBuff >= buff) {
+		putchar(*endOfBuff);
+		endOfBuff--;
+	}
+	printf("\n");
 }
 
 void wordPrint(char* buff, int strLen) {
@@ -227,8 +218,7 @@ int main(int argc, char *argv[]){
         //       the case statement options
 	case 'r':
 	    user_str_len = getLengthOfString(buff, user_str_len);
-	    char* tempBuff = buff;
-	    reverse(tempBuff, user_str_len);
+	    reverse(buff, user_str_len);
 	    break;
 	case 'w':
 	    user_str_len = getLengthOfString(buff, user_str_len);
