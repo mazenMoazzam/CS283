@@ -242,3 +242,11 @@ int main(int argc, char *argv[]){
 //          the buff variable will have exactly 50 bytes?
 //  
 //          PLACE YOUR ANSWER HERE---
+//          Providing both the pointer and the length is a good practice, even after knowing the buff variable will
+//          have 50 bytes, and with passing the length of the buffer, the helper functions are provided with important
+//          context about how much data the function can safely access. Because of this action, it will prevent a buffer
+//          overflow. In addition, with the functions knowing the length of the data they are working with, it can 
+//          handle a wide variety of data sizes more efficiently. This idea is useful when the data size might 
+//          dynamically change at runtime or any other scenarios. In addition to efficienty, knowing the length and 
+//          having the buffer allows for more efficient processing of the source code, as the function can avoid
+//          processing data beyond the intended size or optimize the processing of the function on data size.
