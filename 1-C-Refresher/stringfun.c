@@ -20,8 +20,7 @@ int setup_buff(char *buff, char *user_str, int len){
     //TODO: #4:  Implement the setup buff as per the directions
     char* ptrBuff = buff;
     const char *ptrUserStr = user_str; 
-    char lastCharacter = 0;
-   
+    char lastCharacter = 0;   
     while (*ptrUserStr != '\0' && (ptrBuff - buff) < len) {
 	    if (*ptrUserStr != ' ' && *ptrUserStr != '\t') {
 	    	*ptrBuff++ = *ptrUserStr;
@@ -58,13 +57,10 @@ void usage(char *exename){
 }
 
 
-
 int count_words(char *buff, int len, int str_len){
     int wordCount = 0;
     int endOfWord = 0;
     char* ptrBuff = buff;
-
-
     for (int i = 0; i < str_len; i++, ptrBuff++) {
 	    if ((*ptrBuff != ' ' && *ptrBuff != '.') && !endOfWord) {
 		    endOfWord = 1;
@@ -87,9 +83,14 @@ int getLengthOfString(char* buff, int totalLength) {
 		len++;
 	}
 	return len;
-
 }
 
+
+// The reverse function above, takes two parameters and is used to reverse the string in the buffer.
+// Achieves this using pointer notation by calculating the character in the string using strLen and the buffer,
+// A while loop is created to iterate from the end of the buff to the start of the buff which is a pointer to the 
+// first character, putchar is used to print the current character in reverse as it starts the loop from the last
+// character.
 
 void reverse(char* buff, int strLen) {
 	printf("Reversed: ");
@@ -110,7 +111,6 @@ void wordPrint(char* buff, int strLen) {
 
     printf("Word Print\n");
     printf("----------\n");
-
     while (current - buff < strLen) {
         if ((*current != ' ' && *current != '.' && *current != '\0')) {
             if (wordLen == 0) { 
