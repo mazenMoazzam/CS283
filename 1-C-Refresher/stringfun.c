@@ -74,6 +74,19 @@ void usage(char *exename){
 }
 
 
+
+//The count words function below is used to count the number of words in the provided buffer in the function. 
+//To effectively count the words in the buffer string, ptrBuff is created first to start at the first character of the
+//buffer to begin the process, endOfWord variable acts as a boolean variable to indicate or track when it exits a word
+//boundary, which is defined by spaces or periods. This variable also helps correctly increment the word count. A for
+//loop is initilized to iterate through each character in the string to determine the number of words using pointers.
+//The loop checks if the current character is not a space or a period for the sole reason to distinguish it from the 
+//end of a word, if the conditions are met, end of word is set to a different state (1) and the 
+//wordcount is incremented. If the word is a space or period, it indicates the end of a word, 
+//and the loop resets the endOfWord variable. The loop is until it reaches the end of the string in the buffer and 
+//the word count variable is returned to obtain the value.
+
+
 int count_words(char *buff, int len, int str_len){
     int wordCount = 0;
     int endOfWord = 0;
@@ -92,6 +105,14 @@ int count_words(char *buff, int len, int str_len){
 
 
 //ADD OTHER HELPER FUNCTIONS HERE FOR OTHER REQUIRED PROGRAM OPTIONS
+
+//The purpose of the getLengthOfString function is to determine the length of the string in the buffer disregarding 
+//the filler dots in the buffer. By using pointers start at the first character of the buffer, a counter is set to 0
+//and a loop is made to loop until the current character pointer reaches a period, which indicates the end of the 
+//string in the buffer, in this loop, the character pointer is incremented to traverse through the string and the 
+//length counter is increment by one to indicate an increase in string length, the length counter is returned at the
+//end of the function to indicate the true length of the string.
+
 int getLengthOfString(char* buff, int totalLength) {
 	int len = 0;
 	char* currentChar = buff;
@@ -122,6 +143,14 @@ void reverse(char* buff, int strLen) {
 	}
 }
 
+
+//The word print function below is made to analyze the given buffer in the function parameter containing a string,
+//it also identifies each word, and prints the detailed information about each word, including length and the word
+//itself. It initilizes counters and pointers to track the number of words, starts at the current word and its length.
+//As it iterates through the string, it identifies the characters that belong to a word (not a space, period or etc.) 
+//and counts them. When it encounters a specific delimeter  (space or punctuation), it checks if it has finished
+//processing a word. If it has, it prints the words position in text, the word, and its length before resetting the 
+//counter. This behavior continues until it has reached the end of the string. 
 
 void wordPrint(char* buff, int strLen) {
     int wordNum = 1;  
@@ -222,7 +251,7 @@ int main(int argc, char *argv[]){
     user_str_len = setup_buff(buff, input_string, BUFFER_SZ);     //see todos
     if (user_str_len < 0){
         printf("Error: Provided input string is too long\n");
-        exit(3);
+        exit(99);
     }
 
     switch (opt){
