@@ -137,7 +137,6 @@ void reverse(char* buff, int strLen) {
 		char temp = *start;
 		*start = *end;
 		*end = temp;
-
 		start++;
 		end--;
 	}
@@ -240,7 +239,7 @@ int main(int argc, char *argv[]){
 
     if (buff == NULL) {
 	    printf("Memory allocation failed");
-	    exit(2);
+	    exit(99);
     }
     //TODO:  #3 Allocate space for the buffer using malloc and
     //          handle error if malloc fails by exiting with a 
@@ -251,7 +250,7 @@ int main(int argc, char *argv[]){
     user_str_len = setup_buff(buff, input_string, BUFFER_SZ);     //see todos
     if (user_str_len < 0){
         printf("Error: Provided input string is too long\n");
-        exit(99);
+        exit(2);
     }
 
     switch (opt){
