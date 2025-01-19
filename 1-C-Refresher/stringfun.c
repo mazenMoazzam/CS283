@@ -124,11 +124,11 @@ int getLengthOfString(char* buff, int totalLength) {
 }
 
 
-// The reverse function above, takes two parameters and is used to reverse the string in the buffer.
-// Achieves this using pointer notation by calculating the character in the string using strLen and the buffer,
-// A while loop is created to iterate from the end of the buff to the start of the buff which is a pointer to the 
-// first character, putchar is used to print the current character in reverse as it starts the loop from the last
-// character.
+// The reverse function above, takes two parameters and is used to reverse the string in the buffer. Start and end variables are initialized to 
+// indicate the first character in the word and the last character in the word. A while loop is made to loop until both start and end reach
+// the middle of the string, in this loop, the characters are swapped with a temp variable to reverse the string and the variables are incremented 
+// and decremented to move to the next character. StrLen parameter is used to calculate the last character of the string by adding the buff address
+// to the length of the string minus 1 to give the last character address. 
 
 void reverse(char* buff, int strLen) {
 	char* start = buff;
