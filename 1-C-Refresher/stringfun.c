@@ -16,8 +16,25 @@ void reverse(char* buff, int strLen);
 void wordPrint(char* buff, int strLen);
 
 
+
+
+
+///The setup_buff function processes a string by transferring characters from user_str to buff, stripping out
+//the extra whitespaces and tabs to leave only single spaces between words. This function ensures that the 
+//output string does not exceed the specified length, len. If the input string is longer than len, it returns
+//-1 to indicate the buffer overflow. If the user inputted string is null or empty, it returns a -2 status code.
+//If everything processes, it returns the length of the inputted string. The function after validation, 
+//pads the buffer with dot characters, if the 
+//processed input is shorter than the len (which is essentially the buffer size), which will prepare it for 
+//consistent outputs and formatting for the other commands available.
+
 int setup_buff(char *buff, char *user_str, int len){
     //TODO: #4:  Implement the setup buff as per the directions
+    if (user_str == NULL || *user_str == '\0') {
+        return -2; 
+    }
+	
+	
     char* ptrBuff = buff;
     const char *ptrUserStr = user_str; 
     char lastCharacter = 0;   
@@ -93,34 +110,37 @@ int getLengthOfString(char* buff, int totalLength) {
 // character.
 
 void reverse(char* buff, int strLen) {
-	printf("Reversed: ");
-	char* endOfBuff = buff + strLen - 1;
-	while(endOfBuff >= buff) {
-		putchar(*endOfBuff);
-		endOfBuff--;
+	char* start = buff;
+	char* end = buff + strLen - 1;
+	while (start < end) {
+		char temp = *start;
+		*start = *end;
+		*end = temp;
+
+		start++;
+		end--;
 	}
-	printf("\n");
 }
 
 
 void wordPrint(char* buff, int strLen) {
     int wordNum = 1;  
     char* start = buff;  
-    char* current = buff;  
+    char* currentChar = buff;  
     int wordLen = 0;  
 
     printf("Word Print\n");
     printf("----------\n");
-    while (current - buff < strLen) {
-        if ((*current != ' ' && *current != '.' && *current != '\0')) {
+    while (currentChar - buff < strLen) {
+        if ((*currentChar != ' ' && *currentChar != '.' && *currentChar != '\0')) {
             if (wordLen == 0) { 
-                start = current; 
+                start = currentChar; 
             }
             wordLen++;  
         } else {
             if (wordLen > 0) {
                 printf("%d. ", wordNum++);
-                while (start != current) {
+                while (start != currentChar) {
                     putchar(*start);
                     start++;
                 }
@@ -128,11 +148,12 @@ void wordPrint(char* buff, int strLen) {
                 wordLen = 0;
             }
         }
-        current++; 
+        currentChar++; 
     }
+
     if (wordLen > 0) {
         printf("%d. ", wordNum);
-        while (start != current) {
+        while (start != currentChar) {
             putchar(*start);
             start++;
         }
