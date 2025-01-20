@@ -131,6 +131,14 @@ void reverse(char* buff, int strLen) {
 		start++;
 		end--;
 	}
+
+	printf("Reversed: ");
+	char* current = buff;
+    	while (current < buff + strLen) {
+        	putchar(*current);
+        	current++;
+    	}
+    	putchar('\n'); 
 }
 
 
