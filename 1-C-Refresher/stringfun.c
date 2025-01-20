@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #define BUFFER_SZ 50 
 
-
 //prototypes
 void usage(char *);
 void print_buff(char *, int);
@@ -14,10 +13,6 @@ int  count_words(char *, int, int);
 int getLengthOfString(char* buff, int totalLength);
 void reverse(char* buff, int strLen);
 void wordPrint(char* buff, int strLen);
-
-
-
-
 
 ///The setup_buff function processes a string by transferring characters from user_str to buff, stripping out
 //the extra whitespaces and tabs to leave only single spaces between words. This function ensures that the 
@@ -85,8 +80,6 @@ void usage(char *exename){
 //wordcount is incremented. If the word is a space or period, it indicates the end of a word, 
 //and the loop resets the endOfWord variable. The loop is until it reaches the end of the string in the buffer and 
 //the word count variable is returned to obtain the value.
-
-
 int count_words(char *buff, int len, int str_len){
     int wordCount = 0;
     int endOfWord = 0;
@@ -112,7 +105,6 @@ int count_words(char *buff, int len, int str_len){
 //string in the buffer, in this loop, the character pointer is incremented to traverse through the string and the 
 //length counter is increment by one to indicate an increase in string length, the length counter is returned at the
 //end of the function to indicate the true length of the string.
-
 int getLengthOfString(char* buff, int totalLength) {
 	int len = 0;
 	char* currentChar = buff;
@@ -129,7 +121,6 @@ int getLengthOfString(char* buff, int totalLength) {
 // the middle of the string, in this loop, the characters are swapped with a temp variable to reverse the string and the variables are incremented 
 // and decremented to move to the next character. StrLen parameter is used to calculate the last character of the string by adding the buff address
 // to the length of the string minus 1 to give the last character address. 
-
 void reverse(char* buff, int strLen) {
 	char* start = buff;
 	char* end = buff + strLen - 1;
@@ -156,7 +147,6 @@ void wordPrint(char* buff, int strLen) {
     char* start = buff;  
     char* currentChar = buff;  
     int wordLen = 0;  
-
     printf("Word Print\n");
     printf("----------\n");
     while (currentChar - buff < strLen) {
@@ -277,7 +267,6 @@ int main(int argc, char *argv[]){
             usage(argv[0]);
             exit(1);
     }
-
     //TODO:  #6 Dont forget to free your buffer before exiting
     print_buff(buff,BUFFER_SZ);
     free(buff);
