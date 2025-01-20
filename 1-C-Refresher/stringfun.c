@@ -14,7 +14,7 @@ int getLengthOfString(char* buff, int totalLength);
 void reverse(char* buff, int strLen);
 void wordPrint(char* buff, int strLen);
 
-///The setup_buff function processes a string by transferring characters from user_str to buff, stripping out
+//The setup_buff function processes a string by transferring characters from user_str to buff, stripping out
 //the extra whitespaces and tabs to leave only single spaces between words. This function ensures that the 
 //output string does not exceed the specified length, len. If the input string is longer than len, it returns
 //-1 to indicate the buffer overflow. If the user inputted string is null or empty, it returns a -2 status code.
@@ -28,8 +28,7 @@ int setup_buff(char *buff, char *user_str, int len){
     if (user_str == NULL || *user_str == '\0') {
         return -2; 
     }
-	
-	
+
     char* ptrBuff = buff;
     const char *ptrUserStr = user_str; 
     char lastCharacter = 0;   
@@ -51,7 +50,7 @@ int setup_buff(char *buff, char *user_str, int len){
     while((ptrBuff - buff) < len) { 
 	    *ptrBuff++ = '.';
     }
-    return (ptrBuff - buff); //for now just so the code compiles. 
+    return (ptrBuff - buff);  
 }
 
 
@@ -80,6 +79,7 @@ void usage(char *exename){
 //wordcount is incremented. If the word is a space or period, it indicates the end of a word, 
 //and the loop resets the endOfWord variable. The loop is until it reaches the end of the string in the buffer and 
 //the word count variable is returned to obtain the value.
+
 int count_words(char *buff, int len, int str_len){
     int wordCount = 0;
     int endOfWord = 0;
@@ -97,14 +97,13 @@ int count_words(char *buff, int len, int str_len){
 
 
 
-//ADD OTHER HELPER FUNCTIONS HERE FOR OTHER REQUIRED PROGRAM OPTIONS
-
 //The purpose of the getLengthOfString function is to determine the length of the string in the buffer disregarding 
 //the filler dots in the buffer. By using pointers start at the first character of the buffer, a counter is set to 0
 //and a loop is made to loop until the current character pointer reaches a period, which indicates the end of the 
 //string in the buffer, in this loop, the character pointer is incremented to traverse through the string and the 
 //length counter is increment by one to indicate an increase in string length, the length counter is returned at the
 //end of the function to indicate the true length of the string.
+
 int getLengthOfString(char* buff, int totalLength) {
 	int len = 0;
 	char* currentChar = buff;
@@ -121,6 +120,7 @@ int getLengthOfString(char* buff, int totalLength) {
 // the middle of the string, in this loop, the characters are swapped with a temp variable to reverse the string and the variables are incremented 
 // and decremented to move to the next character. StrLen parameter is used to calculate the last character of the string by adding the buff address
 // to the length of the string minus 1 to give the last character address. 
+
 void reverse(char* buff, int strLen) {
 	char* start = buff;
 	char* end = buff + strLen - 1;
