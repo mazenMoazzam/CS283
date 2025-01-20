@@ -240,15 +240,15 @@ int main(int argc, char *argv[]){
     input_string = argv[2]; //capture the user input string
     buff = malloc(BUFFER_SZ * sizeof(char));
 
-    if (buff == NULL) {
-	    printf("Memory allocation failed");
-	    exit(99);
-    }
     //TODO:  #3 Allocate space for the buffer using malloc and
     //          handle error if malloc fails by exiting with a 
     //          return code of 99
     // CODE GOES HERE FOR #3
-
+    
+    if (buff == NULL) {
+	    printf("Memory allocation failed");
+	    exit(99);
+    }
 
     user_str_len = setup_buff(buff, input_string, BUFFER_SZ);     //see todos
     if (user_str_len < 0){
