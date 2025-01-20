@@ -201,7 +201,12 @@ int main(int argc, char *argv[]){
     //      The code below is safe because if arv[1] does not exist or does not contain the - symbol character
     //      it will result into an error and the code will result into an error, this is safe due to the fact that
     //      this will prevent a segmentation fault with the source code and will prevent from accessing data from
-    //      a non-existent area in memory.
+    //      a non-existent area in memory. In addition, the code below checks the arguments and if either condition
+    //      is true, it means there are not enough arguments provided, or the format of the first argument is incorrect.
+    //      With this, in the cases this happens, the program invokes the usage of the function which displays the 
+    //      correct usage of the program, then exits with a status code. As mentioned before, this is safe because
+    //      it prevents the program from attempting to access argc[1] when it isn't provided, which would avoid 
+    //      accessing out-of-bounds memory location, which will lead to a segmentation fault.
     if ((argc < 2) || (*argv[1] != '-')){
         usage(argv[0]);
         exit(1);
