@@ -100,7 +100,7 @@ int get_student(int fd, int id, student_t *s)
 	    return SRCH_NOT_FOUND;
     }
 
-    off_t offSet = (id - 1) * STUDENT_RECORD_SIZE;
+    off_t offSet = id * STUDENT_RECORD_SIZE;
 
     if (lseek(fd, offSet, SEEK_SET) == -1) {
 	    return ERR_DB_FILE;
@@ -145,8 +145,7 @@ int get_student(int fd, int id, student_t *s)
 
 
 int add_student(int fd, int id, char *fname, char *lname, int gpa) {
-    //printf("Attempting to add student with ID %d\n", id);
-    off_t offSet = (id - 1) * STUDENT_RECORD_SIZE;
+    off_t offSet = id * STUDENT_RECORD_SIZE;
     student_t student;
 
     if (lseek(fd, offSet, SEEK_SET) < 0) {
@@ -230,7 +229,7 @@ int del_student(int fd, int id)
    }
 
    student_t emptyRecord = {0};
-   off_t offSet = (id -1) * STUDENT_RECORD_SIZE;
+   off_t offSet = id* STUDENT_RECORD_SIZE;
 
    if(lseek(fd, offSet, SEEK_SET) < 0) {
 	   printf(M_ERR_DB_WRITE);
@@ -271,53 +270,9 @@ int del_student(int fd, int id)
  *
  */
 
-/*
-int count_db_records(int fd)
-{
-    student_t student;
-    student_t emptyRecord = {0}; 
-    int count = 0;
-    ssize_t bytesRead;
-
-    if (lseek(fd, 0, SEEK_SET) < 0) {
-        printf(M_ERR_DB_READ);
-        return ERR_DB_FILE;
-    }
-
-    while ((bytesRead = read(fd, &student, sizeof(student_t))) > 0) {
-        if (bytesRead < sizeof(student_t)) {
-            printf(M_ERR_DB_READ);
-            return ERR_DB_FILE;
-        }
-        if (memcmp(&student, &emptyRecord, sizeof(student_t)) != 0) {
-            if (student.id != DELETED_STUDENT_ID) {
-                count++;
-            }
-        }
-    }
-
-    if (bytesRead < 0) { 
-        printf(M_ERR_DB_READ);
-        return ERR_DB_FILE;
-    }
-
-    if (count == 0) {
-	//return count;
-        printf(M_DB_EMPTY);
-    } else {
-        //return count;
-        printf(M_DB_RECORD_CNT, count);
-    }
-    return count;
-  
-}
-*/
-
-
-
 int count_db_records(int fd) {
     student_t student;
-    student_t emptyRecord = {0};
+    student_t emptyRecord = EMPTY_STUDENT_RECORD;
     int count = 0;
     ssize_t bytesRead;
 
@@ -391,7 +346,7 @@ int print_db(int fd)
 {
     // TODO
     student_t student;
-    student_t emptyRecord = {0}; 
+    student_t emptyRecord = EMPTY_STUDENT_RECORD; 
     bool isEmpty = true; 
     
     if (lseek(fd, 0, SEEK_SET) < 0) {
@@ -399,7 +354,7 @@ int print_db(int fd)
         return ERR_DB_FILE;
     }
     
-    //printf(STUDENT_PRINT_HDR_STRING, "ID", "FIRST NAME", "LAST_NAME", "GPA"); 
+    
     while (read(fd, &student, sizeof(student_t)) > 0) {
         if (memcmp(&student, &emptyRecord, sizeof(student_t)) != 0 && student.id != DELETED_STUDENT_ID) {
             if (isEmpty) {
@@ -407,8 +362,8 @@ int print_db(int fd)
 	            isEmpty = false;
 	    }
 		
-            float real_gpa = student.gpa / 100.0;
-            printf(STUDENT_PRINT_FMT_STRING, student.id, student.fname, student.lname, real_gpa);
+            float realGpa = student.gpa / 100.0;
+            printf(STUDENT_PRINT_FMT_STRING, student.id, student.fname, student.lname, realGpa);
 	}
     }
 
