@@ -100,7 +100,7 @@ int get_student(int fd, int id, student_t *s)
 	    return SRCH_NOT_FOUND;
     }
 
-    off_t offSet = (id - 1) * sizeof(student_t);
+    off_t offSet = (id - 1) * STUDENT_RECORD_SIZE;
 
     if (lseek(fd, offSet, SEEK_SET) == -1) {
 	    return ERR_DB_FILE;
@@ -146,7 +146,7 @@ int get_student(int fd, int id, student_t *s)
 
 int add_student(int fd, int id, char *fname, char *lname, int gpa) {
     //printf("Attempting to add student with ID %d\n", id);
-    off_t offSet = (id - 1) * sizeof(student_t);
+    off_t offSet = (id - 1) * STUDENT_RECORD_SIZE;
     student_t student;
 
     if (lseek(fd, offSet, SEEK_SET) < 0) {
@@ -230,7 +230,7 @@ int del_student(int fd, int id)
    }
 
    student_t emptyRecord = {0};
-   off_t offSet = (id -1) * sizeof(student_t);
+   off_t offSet = (id -1) * STUDENT_RECORD_SIZE;
 
    if(lseek(fd, offSet, SEEK_SET) < 0) {
 	   printf(M_ERR_DB_WRITE);
