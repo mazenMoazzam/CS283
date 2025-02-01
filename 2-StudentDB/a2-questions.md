@@ -5,7 +5,11 @@ Please answer the following questions and submit in your repo for the second ass
 
 1. In this assignment I asked you provide an implementation for the `get_student(...)` function because I think it improves the overall design of the database application.   After you implemented your solution do you agree that externalizing `get_student(...)` into it's own function is a good design strategy?  Briefly describe why or why not.
 
-    > **Answer**:  _start here_
+    > **Answer**:  I agree externalizing the get_student function into its own function as it is a good design strategy. This is because having this entire function in its own function promotes code reusability and code maintainability. 
+ Instead of duplicating the logic to retrieve a student record across the different parts of the programs where its  
+ needed, the function centralizes the entire logic, which will allow it to be easier to debug and update for new
+ features for future needs of the system. In addition, it allows the function to be independent and not rely on
+ different parts of the program.
 
 2. Another interesting aspect of the `get_student(...)` function is how its function prototype requires the caller to provide the storage for the `student_t` structure:
 

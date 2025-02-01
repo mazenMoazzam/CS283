@@ -477,9 +477,8 @@ void print_student(student_t *s)
  */
 int compress_db(int fd)
 {
-    // TODO
     printf(M_NOT_IMPL);
-    return fd;
+    return fd;	
 }
 
 /*
