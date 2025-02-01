@@ -64,7 +64,21 @@ typedef struct student{
 } student_t;
 
 //Define limits for sudent ids and allowable GPA ranges.  Note GPA values will
-//be stored as integers but printed as floats.  For example a GPA of 450 is really
+//be stored as integers bThe probability that an international flight leaving the United States is delayed in departing (event D) is 0.28. The probability that an international flight leaving the United States is a transpacific flight (event P) is 0.56. The probability that an international flight leaving the United States is a transpacific flight and is delayed in departing is 0.11.
+
+(a) What is the probability that an international flight leaving the United States is delayed in departing given that the flight is a transpacific flight?
+
+Note: Round your answer to 4 decimal places.
+
+
+
+(b) In this problem, are D and P independent?
+
+multiple choice
+Yes
+No
+
+ut printed as floats.  For example a GPA of 450 is really
 //that value divided by 100.0 or 4.50.
 #define MIN_STD_ID      1
 #define MAX_STD_ID      100000
