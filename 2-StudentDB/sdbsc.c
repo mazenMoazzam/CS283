@@ -163,14 +163,12 @@ int add_student(int fd, int id, char *fname, char *lname, int gpa) {
     student_t student;
 
     if (lseek(fd, offSet, SEEK_SET) < 0) {
-        perror("Error seeking in file");
         printf(M_ERR_DB_READ);
 	return ERR_DB_FILE;
     }
 
     ssize_t bytesRead = read(fd, &student, sizeof(student_t));
     if (bytesRead == -1) {
-        perror("Error reading DB file");
 	printf(M_ERR_DB_READ);
         return ERR_DB_FILE;
     } else if (bytesRead < sizeof(student_t)) {
@@ -192,13 +190,11 @@ int add_student(int fd, int id, char *fname, char *lname, int gpa) {
 
     
     if (lseek(fd, offSet, SEEK_SET) < 0) {
-        perror("Error seeking back in file");
 	printf(M_ERR_DB_WRITE);
         return ERR_DB_FILE;
     }
 
     if (write(fd, &student, sizeof(student_t)) != sizeof(student_t)) {
-        perror("Error writing to DB file");
 	printf(M_ERR_DB_WRITE);
         return ERR_DB_FILE;
     }
