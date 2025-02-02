@@ -110,11 +110,20 @@ features for future needs of the system. In addition, it allows the function to 
 
     - Please explain why the file size reported by the `ls` command was 128 bytes after adding student with ID=1, 256 after adding student with ID=3, and 4160 after adding the student with ID=64? 
 
-        > **ANSWER:** _start here_
+        > **ANSWER:** The file size reported by the ls command reflects the logical file size, and not the actual physical storage used. The student_t
+        structure is 64 bytes, and each student is stored at an offset based on their ID (which equals offset = id* 64). After adding the student with 
+        ID = 1, the file size is 2 * 64 bytes = 128, this includes both the record for 1 and an additional blocked reserved for alignment and/or 
+        buffering. Also, after adding the student with ID = 3, the file size increases to 4 * 64 = 256 bytes, and sparse holes fill the gap between
+        IDs 1 and 3. When student ID = 64 was added, the file size jumps to 64 * 64 = 4160 bytes, because records are stored at their own offsets, 
+        and this includes filling all the gaps between IDs.
 
     -   Why did the total storage used on the disk remain unchanged when we added the student with ID=1, ID=3, and ID=63, but increased from 4K to 8K when we added the student with ID=64? 
 
-        > **ANSWER:** _start here_
+        > **ANSWER:** The total storage used on the disk remain unchangeed when we added the student ID = 1, 3, and 63 as linux filesystems allocate
+       storage in blocks, which is about 4k each, even though the file size ls, increases with sparse entries, the actual storage, du, doesn't change
+       because the sparse regions do not consume actual physical disk space. When students with ID 1,3 and 63 were added, the total data still fit 
+       within the first 4k block. When the student ID = 64 was added, the total data exceeded the first 4k block, requiring an additional block, causing
+       the storage to increase by 8k.
 
     - Now lets add one more student with a large student ID number  and see what happens:
 
@@ -127,4 +136,8 @@ features for future needs of the system. In addition, it allows the function to 
         ```
         We see from above adding a student with a very large student ID (ID=99999) increased the file size to 6400000 as shown by `ls` but the raw storage only increased to 12K as reported by `du`.  Can provide some insight into why this happened?
 
-        > **ANSWER:**  _start here_
+        > **ANSWER:**  The large file size of 6400000 bytes occurs of an increase because the student with an ID = 99999 is stored at the offset of
+        99999 * 64 bytes. This creates a huge sparse region between previous students and this new record being added. Sparse regions are not physically
+        allocated on disk, so the file size appears large at first, but the physical storage only increases minimally. The disk usage or raw storage
+        increased by 12k due to the existing data (which was 8k from the previous student entries), and the addition of a small amount of data for 
+        the student with the ID of 99999, requiring only a portion of another block, which was the reasoning of the increase of 12k.
