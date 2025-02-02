@@ -81,7 +81,9 @@ features for future needs of the system. In addition, it allows the function to 
     caller forgets to free the allocated memory, if this is the case, it can result in a memory leak, which will allow for unused memory to be unfreed.
     In addition, another potential problem that can be caused is the performance as well. Specifically, repeatedly allocating and freeing memory is less
     efficient than reusing stack or pre-allocated memory in the system or program. In addition, another potential problem to consider is error handling,
-    this is due to the fact that if multiple memory allocations are required in a bigger system, tracking and freeing memory can become complex.
+    this is due to the fact that if multiple memory allocations are required in a bigger system, tracking and freeing memory can become complex. All in
+    all, the use of malloc would work as malloc dynamically allocates memory onto the heap, which allows the data to persist beyond the function's use
+    enabling the caller to access and manipulate the student record manually after the function returns.
 
 4. Lets take a look at how storage is managed for our simple database. Recall that all student records are stored on disk using the layout of the `student_t` structure (which has a size of 64 bytes).  Lets start with a fresh database by deleting the `student.db` file using the command `rm ./student.db`.  Now that we have an empty database lets add a few students and see what is happening under the covers.  Consider the following sequence of commands:
 
