@@ -76,8 +76,12 @@ features for future needs of the system. In addition, it allows the function to 
     ```
     In this implementation the storage for the student record is allocated on the heap using `malloc()` and passed back to the caller when the function returns. What do you think about this alternative implementation of `get_student(...)`?  Address in your answer why it work work, but also think about any potential problems it could cause.  
     
-    > **ANSWER:** _start here_  
-
+    > **ANSWER:** The alternative implementation of using malloc is it allows the function to provide storage that persists after the function returns
+    its value, which can be useful if it is managed carefully. There are some potential problems with this approach as it can cause memory leaks if the
+    caller forgets to free the allocated memory, if this is the case, it can result in a memory leak, which will allow for unused memory to be unfreed.
+    In addition, another potential problem that can be caused is the performance as well. Specifically, repeatedly allocating and freeing memory is less
+    efficient than reusing stack or pre-allocated memory in the system or program. In addition, another potential problem to consider is error handling,
+    this is due to the fact that if multiple memory allocations are required in a bigger system, tracking and freeing memory can become complex.
 
 4. Lets take a look at how storage is managed for our simple database. Recall that all student records are stored on disk using the layout of the `student_t` structure (which has a size of 64 bytes).  Lets start with a fresh database by deleting the `student.db` file using the command `rm ./student.db`.  Now that we have an empty database lets add a few students and see what is happening under the covers.  Consider the following sequence of commands:
 
