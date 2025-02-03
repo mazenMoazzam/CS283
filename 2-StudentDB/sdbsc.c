@@ -130,7 +130,7 @@ int add_student(int fd, int id, char *fname, char *lname, int gpa) {
         memset(&student, 0, sizeof(student_t));
     }
 
-    student_t emptyRecord = {0};
+    student_t emptyRecord = EMPTY_STUDENT_RECORD;
     if (memcmp(&student, &emptyRecord, sizeof(student_t)) != 0) {
         printf(M_ERR_DB_ADD_DUP, id);
         return ERR_DB_OP;
@@ -192,7 +192,7 @@ int del_student(int fd, int id)
 	   return ERR_DB_FILE;
    }
 
-   student_t emptyRecord = {0};
+   student_t emptyRecord = EMPTY_STUDENT_RECORD;
    off_t offSet = id* STUDENT_RECORD_SIZE;
 
    if(lseek(fd, offSet, SEEK_SET) < 0) {
@@ -322,7 +322,7 @@ int print_db(int fd)
     while (read(fd, &student, sizeof(student_t)) > 0) {
         if (memcmp(&student, &emptyRecord, sizeof(student_t)) != 0 && student.id != DELETED_STUDENT_ID) {
             if (isEmpty) {
-		    printf(STUDENT_PRINT_HDR_STRING, "ID", "FIRST NAME", "LAST_NAME", "GPA");
+		    printf(STUDENT_PRINT_HDR_STRING, "ID", "FIRST_NAME", "LAST_NAME", "GPA");
 	            isEmpty = false;
 	    }
 		
@@ -372,7 +372,7 @@ void print_student(student_t *s)
 	    printf(M_ERR_STD_PRINT);
     } else { 
 	    float realGpa = s->gpa / 100.0;
-	    printf(STUDENT_PRINT_HDR_STRING, "ID", "FIRST NAME", "LAST NAME", "GPA");
+	    printf(STUDENT_PRINT_HDR_STRING, "ID", "FIRST_NAME", "LAST_NAME", "GPA");
             printf(STUDENT_PRINT_FMT_STRING, s->id, s->fname, s->lname, realGpa);
     }
 }

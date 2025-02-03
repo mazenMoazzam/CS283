@@ -154,7 +154,7 @@ setup_file() {
     normalized_output=$(echo -n "$output" | tr -s '[:space:]' ' ')
 
     # Define the expected output (normalized)
-    expected_output="ID FIRST NAME LAST_NAME GPA 1 john doe 3.45 3 jane doe 3.90 63 jim doe 2.85 99999 big dude 2.05"
+    expected_output="ID FIRST_NAME LAST_NAME GPA 1 john doe 3.45 3 jane doe 3.90 63 jim doe 2.85 99999 big dude 2.05"
 
     # Compare the normalized output
     [ "$normalized_output" = "$expected_output" ] || {
