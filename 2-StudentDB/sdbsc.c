@@ -74,10 +74,10 @@ int get_student(int fd, int id, student_t *s)
 	    return ERR_DB_FILE;
     }
 
-    ssize_t bytesRead = read(fd, s, sizeof(student_t));
+    ssize_t bytesRead = read(fd, s, STUDENT_RECORD_SIZE);
     if (bytesRead == -1) {
 	    return ERR_DB_FILE;
-    } else if (bytesRead < sizeof(student_t) || s->id == DELETED_STUDENT_ID) {
+    } else if (bytesRead < STUDENT_RECORD_SIZE || s->id == DELETED_STUDENT_ID) {
 	    return SRCH_NOT_FOUND;
     }
     return NO_ERROR;
@@ -121,17 +121,17 @@ int add_student(int fd, int id, char *fname, char *lname, int gpa) {
 	return ERR_DB_FILE;
     }
 
-    ssize_t bytesRead = read(fd, &student, sizeof(student_t));
+    ssize_t bytesRead = read(fd, &student, STUDENT_RECORD_SIZE);
     if (bytesRead == -1) {
 	printf(M_ERR_DB_READ);
         return ERR_DB_FILE;
-    } else if (bytesRead < sizeof(student_t)) {
+    } else if (bytesRead < STUDENT_RECORD_SIZE) {
         
-        memset(&student, 0, sizeof(student_t));
+        memset(&student, 0, STUDENT_RECORD_SIZE);
     }
 
     student_t emptyRecord = EMPTY_STUDENT_RECORD;
-    if (memcmp(&student, &emptyRecord, sizeof(student_t)) != 0) {
+    if (memcmp(&student, &emptyRecord, STUDENT_RECORD_SIZE) != 0) {
         printf(M_ERR_DB_ADD_DUP, id);
         return ERR_DB_OP;
     }
@@ -148,7 +148,7 @@ int add_student(int fd, int id, char *fname, char *lname, int gpa) {
         return ERR_DB_FILE;
     }
 
-    if (write(fd, &student, sizeof(student_t)) != sizeof(student_t)) {
+    if (write(fd, &student, STUDENT_RECORD_SIZE) != STUDENT_RECORD_SIZE) {
 	printf(M_ERR_DB_WRITE);
         return ERR_DB_FILE;
     }
@@ -200,7 +200,7 @@ int del_student(int fd, int id)
 	   return ERR_DB_FILE;
    }
 
-   if (write(fd, &emptyRecord, sizeof(student_t)) != sizeof(student_t)) {
+   if (write(fd, &emptyRecord, STUDENT_RECORD_SIZE) != STUDENT_RECORD_SIZE) {
 	   printf(M_ERR_DB_WRITE);
 	   return ERR_DB_FILE;
    }
@@ -247,14 +247,14 @@ int count_db_records(int fd) {
     }
 
     
-    while ((bytesRead = read(fd, &student, sizeof(student_t))) > 0) {
+    while ((bytesRead = read(fd, &student, STUDENT_RECORD_SIZE)) > 0) {
        
-        if (bytesRead < sizeof(student_t)) {
+        if (bytesRead < STUDENT_RECORD_SIZE) {
             printf(M_ERR_DB_READ);
             return ERR_DB_FILE;
         }
        
-        if (memcmp(&student, &emptyRecord, sizeof(student_t)) != 0 && student.id != DELETED_STUDENT_ID) {
+        if (memcmp(&student, &emptyRecord, STUDENT_RECORD_SIZE) != 0 && student.id != DELETED_STUDENT_ID) {
             count++;
         }
     }
@@ -319,8 +319,8 @@ int print_db(int fd)
     }
     
     
-    while (read(fd, &student, sizeof(student_t)) > 0) {
-        if (memcmp(&student, &emptyRecord, sizeof(student_t)) != 0 && student.id != DELETED_STUDENT_ID) {
+    while (read(fd, &student, STUDENT_RECORD_SIZE) > 0) {
+        if (memcmp(&student, &emptyRecord, STUDENT_RECORD_SIZE) != 0 && student.id != DELETED_STUDENT_ID) {
             if (isEmpty) {
 		    printf(STUDENT_PRINT_HDR_STRING, "ID", "FIRST_NAME", "LAST_NAME", "GPA");
 	            isEmpty = false;
