@@ -63,16 +63,21 @@ int build_cmd_list(char *cmd_line, command_list_t *clist) {
         if (commandCount >= CMD_MAX) {
             return ERR_TOO_MANY_COMMANDS;
         }
-        char *spacePosition = strchr(command, ' ');
-        if (spacePosition != NULL) {
-            *spacePosition = '\0';  
-            strcpy(clist->commands[commandCount].exe, command);
-            strcpy(clist->commands[commandCount].args, spacePosition + 1);
-        } else {     
-            strcpy(clist->commands[commandCount].exe, command);
-            clist->commands[commandCount].args[0] = '\0'; 
-        }
 
+	if (strcmp(command, "dragon") == 0) {
+		strcpy(clist->commands[commandCount].exe, "dragon");
+		clist->commands[commandCount].args[0] = '\0';
+	} else {
+		char *spacePosition = strchr(command, ' ');
+        	if (spacePosition != NULL) {
+			*spacePosition = '\0';  
+            		strcpy(clist->commands[commandCount].exe, command);
+            		strcpy(clist->commands[commandCount].args, spacePosition + 1);
+        	} else {     
+            		strcpy(clist->commands[commandCount].exe, command);
+            		clist->commands[commandCount].args[0] = '\0'; 
+        	}
+	}
        
         commandCount++;       
         command = strtok(NULL, PIPE_STRING);
