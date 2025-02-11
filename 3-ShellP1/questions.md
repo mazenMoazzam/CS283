@@ -34,12 +34,17 @@
     this is with the symbol, <, or like cat < test.txt. A challenge with doing this is ensuring that the correct file is read when necessary and handling
     errors if the file does not exist by any chance. Another redirection example we can use in our shell is the output redirection, > or >>, we can use
     redirection to output the shell system to a file or somewhere else. A potential challenge with htis is implementing file handling and ensuring that
-    redirection does not interfere with normal command execution at runtime. 
+    redirection does not interfere with normal command execution at runtime. Another redirection example involves with the stderr, which is used with the
+    symbol x>, with x representing the exit code that needs to be returned, a potential challenge that can occur with this is differentiating between
+    stdout and stderr and how exactly to handle both effectively and not get confused with what needs to be output and not. 
     
 
 - You should have also learned about "pipes". Redirection and piping both involve controlling input and output in the shell, but they serve different purposes. Explain the key differences between redirection and piping.
 
-    > **Answer**:  _start here_
+    > **Answer**:  The key differences between redirection and piping is redirection involves and changes where input/output comes from and goes to in the
+    shell, while piping connects the output of one command directly as an input to another command in the shell. Redirection works with files, while
+    piping concept works with individual commands such as ls | grep text. Piping is essentially allowing commands to be chained together which can form
+    a pipeline. Redirection deals with the input and output of a command directly.
 
 - STDERR is often used for error messages, while STDOUT is for regular output. Why is it important to keep these separate in a shell?
 
