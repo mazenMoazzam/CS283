@@ -48,8 +48,11 @@
 
 - STDERR is often used for error messages, while STDOUT is for regular output. Why is it important to keep these separate in a shell?
 
-    > **Answer**:  _start here_
+    > **Answer**:  This is important to keep these seperate due to the fact that we should use the shell system to differentiate between an input
+    and an error, it is important to redirect errors and input different as they are different things and are contingent on a lot of things. In addition,
+    with keeping these seperate it will prevent errors and input from interfere for different processes and will maintain the shell systems robust and
+    manageable structure.
 
 - How should our custom shell handle errors from commands that fail? Consider cases where a command outputs both STDOUT and STDERR. Should we provide a way to merge them, and if so, how?
 
-    > **Answer**:  _start here_
+    > **Answer**:  
