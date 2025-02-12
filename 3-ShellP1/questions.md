@@ -55,4 +55,9 @@
 
 - How should our custom shell handle errors from commands that fail? Consider cases where a command outputs both STDOUT and STDERR. Should we provide a way to merge them, and if so, how?
 
-    > **Answer**:  
+    > **Answer**: How our custom shell should handle errors from commands that fail is that it should capture the incorrect or errored command and from
+    there it should report it to STDERR from STDOUT seperately, this will make sure that the error messages will not interfere with the regular
+    command output. As mentioned earlier with redirection, we can redirect the errors to a log file to store the errors with a different format as well
+    to differentiate it from the actual output. Our custom shell should provide a way to merge error and outputting when necessary and this can be 
+    done by using redirection which was mentioned earlier, or using techniques to redirect error and output to a single stream. This in hand will make
+    debugging much easier to understand and figure out as well with this system in place.  
