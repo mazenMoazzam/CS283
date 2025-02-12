@@ -50,9 +50,9 @@ int build_cmd_list(char *cmd_line, command_list_t *clist) {
     
     while (command != NULL) {
         char *endOfString = command + strlen(command) - 1;
-	
-	while (*command != '\0' && isspace(*command)) {
-		command++;
+
+        while (*command != '\0' && isspace(*command)) {
+			command++; 
 	}
 
         while (endOfString > command && isspace(*endOfString)) { 
@@ -68,13 +68,15 @@ int build_cmd_list(char *cmd_line, command_list_t *clist) {
 		strcpy(clist->commands[commandCount].exe, "dragon");
 		clist->commands[commandCount].args[0] = '\0';
 	} else {
-		char *spacePosition = strchr(command, ' ');
-        	if (spacePosition != NULL) {
-			*spacePosition = '\0';  
-            		strcpy(clist->commands[commandCount].exe, command);
-            		strcpy(clist->commands[commandCount].args, spacePosition + 1);
+		char *commandSpacePosition = strchr(command, ' ');
+		char* parsedExecutableFromCommand = clist->commands[commandCount].exe;
+		char* parsedArgumentsFromCommand = clist->commands[commandCount].args;
+        	if (commandSpacePosition != NULL) {
+			*commandSpacePosition = '\0';  
+            		strcpy(parsedExecutableFromCommand, command);
+            		strcpy(parsedArgumentsFromCommand, commandSpacePosition + 1);
         	} else {     
-            		strcpy(clist->commands[commandCount].exe, command);
+            		strcpy(parsedExecutableFromCommand, command);
             		clist->commands[commandCount].args[0] = '\0'; 
         	}
 	}
