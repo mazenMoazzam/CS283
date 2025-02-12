@@ -65,6 +65,10 @@ int build_cmd_list(char *cmd_line, command_list_t *clist) {
         }
 
 	if (strcmp(command, "dragon") == 0) {
+		if (strlen("dragon") >= CMD_MAX) {
+			return ERR_CMD_OR_ARGS_TOO_BIG;
+		}
+
 		strcpy(clist->commands[commandCount].exe, "dragon");
 		clist->commands[commandCount].args[0] = '\0';
 	} else {
@@ -72,8 +76,16 @@ int build_cmd_list(char *cmd_line, command_list_t *clist) {
 		char* parsedExecutableFromCommand = clist->commands[commandCount].exe;
 		char* parsedArgumentsFromCommand = clist->commands[commandCount].args;
         	if (commandSpacePosition != NULL) {
-			*commandSpacePosition = '\0';  
+			*commandSpacePosition = '\0';
+
+		        if (strlen(command) >= CMD_MAX) {
+				return ERR_CMD_OR_ARGS_TOO_BIG;
+			}	
             		strcpy(parsedExecutableFromCommand, command);
+
+			if (strlen(commandSpacePosition + 1) >= ARG_MAX) {
+				return ERR_CMD_OR_ARGS_TOO_BIG;
+			}
             		strcpy(parsedArgumentsFromCommand, commandSpacePosition + 1);
         	} else {     
             		strcpy(parsedExecutableFromCommand, command);
