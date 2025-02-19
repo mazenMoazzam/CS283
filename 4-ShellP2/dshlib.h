@@ -68,7 +68,9 @@ Built_In_Cmds exec_built_in_cmd(cmd_buff_t *cmd);
 int exec_local_cmd_loop();
 int exec_cmd(cmd_buff_t *cmd);
 
-
+char* skipWhiteSpace(char* str);
+char* processQuoteStrings(char* str, cmd_buff_t *cmd_buff);
+char* processUnquotedStrings(char* str, cmd_buff_t *cmd_buff);
 
 
 //output constants

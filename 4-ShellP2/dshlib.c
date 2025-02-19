@@ -7,6 +7,45 @@
 #include <sys/wait.h>
 #include <ctype.h>
 
+char* skipWhiteSpace(char* string) {
+	while (*string && isspace((unsigned char)*string)) {
+		string++;
+	}
+	return string;
+}
+
+char* processQuoteStrings(char* string, cmd_buff_t *cmd_buff) {
+	string++;
+	cmd_buff->argv[cmd_buff->argc++] = string;
+	
+	while (*string && *string != '\"') {
+		string++;
+	}
+	
+	if (*string == '\"') {
+        	*string = '\0'; 
+        	string++;
+    	}
+
+    	return string;
+}
+
+
+char* processUnquotedStrings(char* string, cmd_buff_t *cmd_buff) {
+    cmd_buff->argv[cmd_buff->argc++] = string;
+
+    while (*string && !isspace((unsigned char)*string)) {
+        string++;
+    }
+
+    if (*string) {
+        *string = '\0'; 
+        string++;
+    }
+
+    return string;
+}
+
 
 int alloc_cmd_buff(cmd_buff_t *cmd_buff) {
     cmd_buff->_cmd_buffer = malloc(SH_CMD_MAX);
@@ -33,70 +72,41 @@ int clear_cmd_buff(cmd_buff_t *cmd_buff) {
 }
 
 
+
 int build_cmd_buff(char *cmd_line, cmd_buff_t *cmd_buff) {
-	
     if (!cmd_line || strlen(cmd_line) >= SH_CMD_MAX) {
-	    return ERR_CMD_OR_ARGS_TOO_BIG;
+        return ERR_CMD_OR_ARGS_TOO_BIG;
     }
-    
+
     cmd_buff->_cmd_buffer = strdup(cmd_line);
-    
     if (!cmd_buff->_cmd_buffer) {
-	    return ERR_MEMORY;
+        return ERR_MEMORY;
     }
 
     cmd_buff->argc = 0;
-    int isQuoted = 0;
     char *commandLineStringPointer = cmd_buff->_cmd_buffer;
 
-   
     while (*commandLineStringPointer) {
-        while (isspace((unsigned char)*commandLineStringPointer)) {
-		commandLineStringPointer++; 
-	}
-
+        commandLineStringPointer = skipWhiteSpace(commandLineStringPointer);
 
         if (*commandLineStringPointer == '\0') {
-		break;
-	}
-        
-	if (*commandLineStringPointer == '\"') {
-            isQuoted = 1;
-            commandLineStringPointer++; 
-            cmd_buff->argv[cmd_buff->argc++] = commandLineStringPointer;
-            
-	    while (*commandLineStringPointer && !(*commandLineStringPointer == '\"' && isQuoted)) {
-		    commandLineStringPointer++;
-	    }
+            break;
+        }
 
-            if (*commandLineStringPointer == '\"') {
-                *commandLineStringPointer = '\0'; 
-                commandLineStringPointer++; 
-	    }
-
+        if (*commandLineStringPointer == '\"') {
+            commandLineStringPointer = processQuoteStrings(commandLineStringPointer, cmd_buff);
         } else {
-            
-	    cmd_buff->argv[cmd_buff->argc++] = commandLineStringPointer;
-            
-	    while (*commandLineStringPointer && !isspace((unsigned char)*commandLineStringPointer)) {
-		    commandLineStringPointer++;
-	    }
-            
-	    if (*commandLineStringPointer) {
-                *commandLineStringPointer = '\0'; 
-                commandLineStringPointer++;
-            }
+            commandLineStringPointer = processUnquotedStrings(commandLineStringPointer, cmd_buff);
         }
 
         if (cmd_buff->argc >= CMD_MAX) {
-		return ERR_TOO_MANY_COMMANDS;
-	}
+            return ERR_TOO_MANY_COMMANDS;
+        }
     }
 
     cmd_buff->argv[cmd_buff->argc] = NULL;
     return OK;
 }
-
 
 Built_In_Cmds match_command(const char *input) {
     if (strcmp(input, "exit") == 0) {
