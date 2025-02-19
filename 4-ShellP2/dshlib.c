@@ -5,15 +5,20 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <ctype.h>
+
 
 int alloc_cmd_buff(cmd_buff_t *cmd_buff) {
     cmd_buff->_cmd_buffer = malloc(SH_CMD_MAX);
+    
     if (!cmd_buff->_cmd_buffer) {
-	    return ERR_MEMORY;
+	   return ERR_MEMORY;
     }
+
+
+    memset(cmd_buff, 0, sizeof(cmd_buff_t));
     return OK;
 }
-
 
 int free_cmd_buff(cmd_buff_t *cmd_buff) {
     if (cmd_buff->_cmd_buffer != NULL) {
@@ -29,57 +34,53 @@ int clear_cmd_buff(cmd_buff_t *cmd_buff) {
 
 
 int build_cmd_buff(char *cmd_line, cmd_buff_t *cmd_buff) {
-    if (!cmd_line || strlen(cmd_line) > SH_CMD_MAX)
-        return ERR_CMD_OR_ARGS_TOO_BIG;
-
-    cmd_buff->argc = 0;
+    
+	
+    if (!cmd_line || strlen(cmd_line) >= SH_CMD_MAX) {
+	    return ERR_CMD_OR_ARGS_TOO_BIG;
+    }
+    
     cmd_buff->_cmd_buffer = strdup(cmd_line);
-    if (!cmd_buff->_cmd_buffer)
-        return ERR_MEMORY;
+    
+    if (!cmd_buff->_cmd_buffer) {
+	    return ERR_MEMORY;
+    }
+    cmd_buff->argc = 0;
+    char *src = cmd_buff->_cmd_buffer;
 
-    char *buffer = cmd_buff->_cmd_buffer;
-    char *arg;
     int in_quotes = 0;
 
-    while (*buffer) {
-        while (*buffer == SPACE_CHAR) {
-            buffer++;  // Skip spaces
-        }
+    while (*src) {
+        while (isspace((unsigned char)*src)) src++; 
 
-        if (*buffer == '\0') {
-            break;
-        }
+        if (*src == '\0') break;
 
-       
-        if (*buffer == '"') {  // Start of quoted argument
+        if (*src == '\"') {
             in_quotes = 1;
-            buffer++;  // Skip the opening quote
-            arg = buffer;  // Mark the start of the argument
-            while (*buffer && (*buffer != '"' || (buffer > arg && *(buffer - 1) == '\\'))) {
-                buffer++;  // Continue until the closing quote or a backslash is found before a quote
+            src++; 
+            cmd_buff->argv[cmd_buff->argc++] = src;
+            while (*src && !(*src == '\"' && in_quotes)) src++;
+            if (*src == '\"') {
+                *src = '\0'; 
+                src++; 
             }
-            if (*buffer == '"') {  // End of quoted argument
-                *buffer = '\0';  // Null-terminate the argument
-                buffer++;  // Skip over the closing quote
-            }
-        } else {  // Regular argument (no quotes)
-            arg = buffer;
-            while (*buffer && *buffer != SPACE_CHAR) {
-                buffer++;  // Continue until space or end of line
-            }
-            if (*buffer != '\0') {
-                *buffer = '\0';  // Null-terminate the argument
-                buffer++;  // Skip over the space
+        } else {
+            cmd_buff->argv[cmd_buff->argc++] = src;
+            while (*src && !isspace((unsigned char)*src)) src++;
+            if (*src) {
+                *src = '\0'; 
+                src++;
             }
         }
 
-        cmd_buff->argv[cmd_buff->argc++] = arg;  // Save the argument
+        if (cmd_buff->argc >= CMD_MAX) {
+		return ERR_TOO_MANY_COMMANDS;
+	}
     }
 
-    return BI_EXECUTED; 
+    cmd_buff->argv[cmd_buff->argc] = NULL;
+    return OK;
 }
-
-
 
 
 
@@ -87,66 +88,63 @@ int build_cmd_buff(char *cmd_line, cmd_buff_t *cmd_buff) {
 
 
 Built_In_Cmds match_command(const char *input) {
-    if (strcmp(input, EXIT_CMD) == 0) return BI_CMD_EXIT;
-    if (strcmp(input, "cd") == 0) return BI_CMD_CD;
+    if (strcmp(input, "exit") == 0) return BI_CMD_EXIT;
     if (strcmp(input, "dragon") == 0) return BI_CMD_DRAGON;
+    if (strcmp(input, "cd") == 0) return BI_CMD_CD;
     return BI_NOT_BI;
 }
 
-
 Built_In_Cmds exec_built_in_cmd(cmd_buff_t *cmd) {
-    Built_In_Cmds cmd_type = match_command(cmd->argv[0]);
-    switch (cmd_type) {
+    if (cmd->argc == 0) return BI_NOT_BI;
+    
+    switch (match_command(cmd->argv[0])) {
         case BI_CMD_EXIT:
-            exit(OK_EXIT);
+            exit(0);
         case BI_CMD_CD:
-            if (cmd->argc < 2) {
-                return ERR_CMD_ARGS_BAD;
+            if (cmd->argc > 1) {
+                if (chdir(cmd->argv[1]) != 0) {
+                    perror("cd failed");
+                }
             }
-            if (chdir(cmd->argv[1]) != 0) {
-                perror("cd failed");
-            } else {
-            }
-            return BI_EXECUTED;
-        case BI_CMD_DRAGON:
             return BI_EXECUTED;
         default:
             return BI_NOT_BI;
     }
 }
 
-
 int exec_cmd(cmd_buff_t *cmd) {
+    if (exec_built_in_cmd(cmd) == BI_EXECUTED) return OK;
+    
     pid_t pid = fork();
-    if (pid < 0) return ERR_EXEC_CMD;
-    else if (pid == 0) {
+    if (pid == 0) {
         execvp(cmd->argv[0], cmd->argv);
         perror("execvp failed");
         exit(ERR_EXEC_CMD);
-    } else {
+    } else if (pid > 0) {
         int status;
         waitpid(pid, &status, 0);
-        return WIFEXITED(status) ? WEXITSTATUS(status) : ERR_EXEC_CMD;
+    } else {
+        perror("fork failed");
+        return ERR_EXEC_CMD;
     }
+    return OK;
 }
-
 
 int exec_local_cmd_loop() {
     char input[SH_CMD_MAX];
-    cmd_buff_t cmd;
-    
-    if (alloc_cmd_buff(&cmd) != OK) return ERR_MEMORY;
+    cmd_buff_t cmd_buff;
+    alloc_cmd_buff(&cmd_buff);
     
     while (1) {
         printf(SH_PROMPT);
         if (!fgets(input, SH_CMD_MAX, stdin)) break;
-        input[strcspn(input, "\n")] = 0; 
+        input[strcspn(input, "\n")] = 0;  
+        clear_cmd_buff(&cmd_buff);
         
-        if (build_cmd_buff(input, &cmd) == WARN_NO_CMDS) continue;
-        if (exec_built_in_cmd(&cmd) == BI_NOT_BI) exec_cmd(&cmd);
+        if (build_cmd_buff(input, &cmd_buff) == OK) {
+            exec_cmd(&cmd_buff);
+        }
     }
-    
-    free_cmd_buff(&cmd);
+    free_cmd_buff(&cmd_buff);
     return OK;
 }
-
