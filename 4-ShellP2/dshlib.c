@@ -34,7 +34,6 @@ int clear_cmd_buff(cmd_buff_t *cmd_buff) {
 
 
 int build_cmd_buff(char *cmd_line, cmd_buff_t *cmd_buff) {
-    
 	
     if (!cmd_line || strlen(cmd_line) >= SH_CMD_MAX) {
 	    return ERR_CMD_OR_ARGS_TOO_BIG;
@@ -45,31 +44,47 @@ int build_cmd_buff(char *cmd_line, cmd_buff_t *cmd_buff) {
     if (!cmd_buff->_cmd_buffer) {
 	    return ERR_MEMORY;
     }
+
     cmd_buff->argc = 0;
-    char *src = cmd_buff->_cmd_buffer;
+    int isQuoted = 0;
+    char *commandLineStringPointer = cmd_buff->_cmd_buffer;
 
-    int in_quotes = 0;
+   
+    while (*commandLineStringPointer) {
+        while (isspace((unsigned char)*commandLineStringPointer)) {
+		commandLineStringPointer++; 
+	}
 
-    while (*src) {
-        while (isspace((unsigned char)*src)) src++; 
 
-        if (*src == '\0') break;
+        if (*commandLineStringPointer == '\0') {
+		break;
+	}
+        
+	if (*commandLineStringPointer == '\"') {
+            isQuoted = 1;
+            commandLineStringPointer++; 
+            cmd_buff->argv[cmd_buff->argc++] = commandLineStringPointer;
+            
+	    while (*commandLineStringPointer && !(*commandLineStringPointer == '\"' && isQuoted)) {
+		    commandLineStringPointer++;
+	    }
 
-        if (*src == '\"') {
-            in_quotes = 1;
-            src++; 
-            cmd_buff->argv[cmd_buff->argc++] = src;
-            while (*src && !(*src == '\"' && in_quotes)) src++;
-            if (*src == '\"') {
-                *src = '\0'; 
-                src++; 
-            }
+            if (*commandLineStringPointer == '\"') {
+                *commandLineStringPointer = '\0'; 
+                commandLineStringPointer++; 
+	    }
+
         } else {
-            cmd_buff->argv[cmd_buff->argc++] = src;
-            while (*src && !isspace((unsigned char)*src)) src++;
-            if (*src) {
-                *src = '\0'; 
-                src++;
+            
+	    cmd_buff->argv[cmd_buff->argc++] = commandLineStringPointer;
+            
+	    while (*commandLineStringPointer && !isspace((unsigned char)*commandLineStringPointer)) {
+		    commandLineStringPointer++;
+	    }
+            
+	    if (*commandLineStringPointer) {
+                *commandLineStringPointer = '\0'; 
+                commandLineStringPointer++;
             }
         }
 
@@ -137,7 +152,11 @@ int exec_local_cmd_loop() {
     
     while (1) {
         printf(SH_PROMPT);
-        if (!fgets(input, SH_CMD_MAX, stdin)) break;
+        
+	if (!fgets(input, SH_CMD_MAX, stdin)) {
+		break;
+	}
+
         input[strcspn(input, "\n")] = 0;  
         clear_cmd_buff(&cmd_buff);
         
