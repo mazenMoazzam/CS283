@@ -98,10 +98,6 @@ int build_cmd_buff(char *cmd_line, cmd_buff_t *cmd_buff) {
 }
 
 
-
-
-
-
 Built_In_Cmds match_command(const char *input) {
     if (strcmp(input, "exit") == 0) {
 	    return BI_CMD_EXIT;
@@ -114,9 +110,12 @@ Built_In_Cmds match_command(const char *input) {
     }
 }
 
+
 Built_In_Cmds exec_built_in_cmd(cmd_buff_t *cmd) {
-    if (cmd->argc == 0) return BI_NOT_BI;
-    
+    if (cmd->argc == 0) {
+	    return BI_NOT_BI;
+    }
+
     switch (match_command(cmd->argv[0])) {
         case BI_CMD_EXIT:
             exit(0);
@@ -133,8 +132,10 @@ Built_In_Cmds exec_built_in_cmd(cmd_buff_t *cmd) {
 }
 
 int exec_cmd(cmd_buff_t *cmd) {
-    if (exec_built_in_cmd(cmd) == BI_EXECUTED) return OK;
-    
+    if (exec_built_in_cmd(cmd) == BI_EXECUTED) {
+	    return OK;
+    }
+
     pid_t pid = fork();
     if (pid == 0) {
         execvp(cmd->argv[0], cmd->argv);
