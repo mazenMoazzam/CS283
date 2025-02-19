@@ -103,10 +103,15 @@ int build_cmd_buff(char *cmd_line, cmd_buff_t *cmd_buff) {
 
 
 Built_In_Cmds match_command(const char *input) {
-    if (strcmp(input, "exit") == 0) return BI_CMD_EXIT;
-    if (strcmp(input, "dragon") == 0) return BI_CMD_DRAGON;
-    if (strcmp(input, "cd") == 0) return BI_CMD_CD;
-    return BI_NOT_BI;
+    if (strcmp(input, "exit") == 0) {
+	    return BI_CMD_EXIT;
+    } else if (strcmp(input, "dragon") == 0) {
+	    return BI_CMD_DRAGON;
+    } else if (strcmp(input, "cd") == 0) {
+	    return BI_CMD_CD;
+    } else {
+	    return BI_NOT_BI;
+    }
 }
 
 Built_In_Cmds exec_built_in_cmd(cmd_buff_t *cmd) {
