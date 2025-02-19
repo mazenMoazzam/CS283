@@ -34,11 +34,11 @@ char* processQuoteStrings(char* commandLineString, cmd_buff_t *cmd_buff) {
 char* processUnquotedStrings(char* commandLineString, cmd_buff_t *cmd_buff) {
     cmd_buff->argv[cmd_buff->argc++] = commandLineString;
 
-    while (*commandLineString && !isspace((unsigned char)*commandLineString)) {
+    while (*commandLineString != '\0' && !isspace((unsigned char)*commandLineString)) {
         commandLineString++;
     }
 
-    if (*commandLineString) {
+    if (*commandLineString != '\0') {
         *commandLineString = '\0'; 
         commandLineString++;
     }
@@ -86,7 +86,7 @@ int build_cmd_buff(char *cmd_line, cmd_buff_t *cmd_buff) {
     cmd_buff->argc = 0;
     char *commandLineStringPointer = cmd_buff->_cmd_buffer;
 
-    while (*commandLineStringPointer) {
+    while (*commandLineStringPointer != '\0') {
         commandLineStringPointer = skipWhiteSpace(commandLineStringPointer);
 
         if (*commandLineStringPointer == '\0') {
