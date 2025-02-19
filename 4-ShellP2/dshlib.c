@@ -7,43 +7,43 @@
 #include <sys/wait.h>
 #include <ctype.h>
 
-char* skipWhiteSpace(char* string) {
-	while (*string && isspace((unsigned char)*string)) {
-		string++;
+char* skipWhiteSpace(char* commandLineString) {
+	while (*commandLineString && isspace((unsigned char)*commandLineString)) {
+		commandLineString++;
 	}
-	return string;
+	return commandLineString;
 }
 
-char* processQuoteStrings(char* string, cmd_buff_t *cmd_buff) {
-	string++;
-	cmd_buff->argv[cmd_buff->argc++] = string;
+char* processQuoteStrings(char* commandLineString, cmd_buff_t *cmd_buff) {
+	commandLineString++;
+	cmd_buff->argv[cmd_buff->argc++] = commandLineString;
 	
-	while (*string && *string != '\"') {
-		string++;
+	while (*commandLineString && *commandLineString != '\"') {
+		commandLineString++;
 	}
 	
-	if (*string == '\"') {
-        	*string = '\0'; 
-        	string++;
+	if (*commandLineString == '\"') {
+        	*commandLineString = '\0'; 
+        	commandLineString++;
     	}
 
-    	return string;
+    	return commandLineString;
 }
 
 
-char* processUnquotedStrings(char* string, cmd_buff_t *cmd_buff) {
-    cmd_buff->argv[cmd_buff->argc++] = string;
+char* processUnquotedStrings(char* commandLineString, cmd_buff_t *cmd_buff) {
+    cmd_buff->argv[cmd_buff->argc++] = commandLineString;
 
-    while (*string && !isspace((unsigned char)*string)) {
-        string++;
+    while (*commandLineString && !isspace((unsigned char)*commandLineString)) {
+        commandLineString++;
     }
 
-    if (*string) {
-        *string = '\0'; 
-        string++;
+    if (*commandLineString) {
+        *commandLineString = '\0'; 
+        commandLineString++;
     }
 
-    return string;
+    return commandLineString;
 }
 
 
