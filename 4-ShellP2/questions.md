@@ -1,18 +1,28 @@
 1. Can you think of why we use `fork/execvp` instead of just calling `execvp` directly? What value do you think the `fork` provides?
 
-    > **Answer**:  _start here_
+    > **Answer**: We use fork() before calling execvp() directly due to the fact that we need to create a seperate child
+    process for executing the new established program while keeping the parent process running intact. This is because,
+    if we called execvp() directly, the current process would be replaced with the new program, and because of this, 
+    it would lose control over execution flow.
 
 2. What happens if the fork() system call fails? How does your implementation handle this scenario?
 
-    > **Answer**:  _start here_
+    > **Answer**:  If the fork system call fails, it returns -1, which indicates that no new process was created, 
+    this will usually happen when the system runs out of processes or memory to run. My implementation handles this
+    by checking the return value of the fork() function, and if it returns -1, it can print a message of the function
+    or process failure, then we would exit or retry the process depending on the context of the usage of the software.
 
 3. How does execvp() find the command to execute? What system environment variable plays a role in this process?
 
-    > **Answer**:  _start here_
+    > **Answer**:  Execvp() finds the command to execute by searching for the command in the directories specified
+    by the path environment variable, which contains the directory path of the command. The function checks if the
+    command contains a /, if it does, it executes the command directly. The path variable in the environment is crucial
+    in this process as it tells the execvp() function where to look for commands with the absolute or relative path of
+    its location.
 
 4. What is the purpose of calling wait() in the parent process after forking? What would happen if we didn’t call it?
 
-    > **Answer**:  _start here_
+    > **Answer**:  
 
 5. In the referenced demo code we used WEXITSTATUS(). What information does this provide, and why is it important?
 
