@@ -133,6 +133,7 @@ Built_In_Cmds exec_built_in_cmd(cmd_buff_t *cmd) {
             if (cmd->argc > 1) {
                 if (chdir(cmd->argv[1]) != 0) {
                     perror("cd failed");
+		    return ERR_EXEC_CMD;
                 }
             }
             return BI_EXECUTED;
@@ -154,6 +155,10 @@ int exec_cmd(cmd_buff_t *cmd) {
     } else if (pid > 0) {
         int status;
         waitpid(pid, &status, 0);
+
+	if (WIFEXITED(status)) {
+		return WEXITSTATUS(status); 
+	}
     } else {
         perror("fork failed");
         return ERR_EXEC_CMD;
