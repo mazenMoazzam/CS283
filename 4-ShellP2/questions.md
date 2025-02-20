@@ -22,11 +22,18 @@
 
 4. What is the purpose of calling wait() in the parent process after forking? What would happen if we didn’t call it?
 
-    > **Answer**:  
+    > **Answer**: The purpose of calling wait function in the parent process after forking is it makes sure the 
+    parent process waits for the child process to complete before continuing forward. This prevents unseen processes
+    to happen and helps manage process termination properly. If we didn't call the wait() function, the child process
+    may finish exeution, but its exit status for it remains in the system until the parent reads it, this would
+    result in consuming resources unncessarily and redundantly.  
 
 5. In the referenced demo code we used WEXITSTATUS(). What information does this provide, and why is it important?
 
-    > **Answer**:  _start here_
+    > **Answer**:  Using WEXITSTATUS() function provides us with the exit status of the terminated child process
+    from the status code returned by the wait function. This is important due to the fact that it tells us whether
+    the child porcess executed successfully (0) or if it failed. In addition, it is important because it allows error
+    handling and debugging in the parent process if needed.
 
 6. Describe how your implementation of build_cmd_buff() handles quoted arguments. Why is this necessary?
 
