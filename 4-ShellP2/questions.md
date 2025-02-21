@@ -76,4 +76,4 @@
     > **Answer**: When a process receives a SIGSTOP, what happens is that it pauses execution until it receives
     SIGCONT, this signal cannot be caught, ignored, or blocked. This is because it is enforced by the kernal to 
     allow an admin or a debugger to suspend or stop the process. The usecase for this signal is to suspend the 
-    process temporarily 
+    process temporarily. 
