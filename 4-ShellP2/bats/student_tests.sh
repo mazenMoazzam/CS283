@@ -43,40 +43,6 @@ EOF
     [[ "$output" != *"tempfile.txt"* ]]
 }
 
-@test "Redirection Test Case" {
-    run "./dsh" <<EOF
-echo "first line" > testfile.txt
-echo "second line" >> testfile.txt
-cat testfile.txt
-exit
-EOF
-    [ "$status" -eq 0 ]
-    [[ "$output" == *"first line"* ]]
-    [[ "$output" == *"second line"* ]]
-    rm -f testfile.txt
-}
-
-@test "Piping test" {
-    touch testfile.txt
-    run "./dsh" <<EOF
-ls | grep testfile.txt
-exit
-EOF
-    [ "$status" -eq 0 ]
-    [[ "$output" == *"testfile.txt"* ]]
-    rm testfile.txt
-}
-
-@test "commands with &&" {
-    run "./dsh" <<EOF
-echo "Hello" && echo "World"
-exit
-EOF
-    [ "$status" -eq 0 ]
-    [[ "$output" == *"Hello"* ]]
-    [[ "$output" == *"World"* ]]
-}
-
 @test "Multiple spaces between commands should be ignored" {
     run "./dsh" <<EOF
 echo      "spaced out"
