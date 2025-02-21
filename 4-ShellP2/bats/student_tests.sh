@@ -1,99 +1,113 @@
 #!/usr/bin/env bats
 
-############################# STUDENT TEST CASES #####################################
 # File: student_tests.sh
-#
-# Additional test cases to cover more edge cases and functionalities.
-#####################################################################################
 
-@test "Change directory to non-existent folder" {
-    run ./dsh <<EOF
-cd /this/folder/does/not/exist
-EOF
-
-    echo "Captured stdout:" 
-    echo "Output: $output"
-    echo "Exit Status: $status"
-
-    # The command should fail
-    [ "$status" -ne 0 ]
-}
-
-@test "Echo multiple arguments" {
-    run ./dsh <<EOF
-echo hello world from dsh
-EOF
-
-    stripped_output=$(echo "$output" | tr -d '[:space:]')
-    expected_output="helloworldfromdshdsh2>dsh2>cmdloopreturned0"
-
-    echo "Captured stdout:" 
-    echo "Output: $output"
-    echo "Exit Status: $status"
-    echo "${stripped_output} -> ${expected_output}"
-
-    [ "$stripped_output" = "$expected_output" ]
-    [ "$status" -eq 0 ]
-}
-
-@test "Run an invalid command" {
-    run ./dsh <<EOF
-notarealcommand
-EOF
-
-    echo "Captured stdout:" 
-    echo "Output: $output"
-    echo "Exit Status: $status"
-
-    # The command should fail
-    [ "$status" -ne 0 ]
-}
-
-@test "Check exit command" {
-    run ./dsh <<EOF
+@test "cd to home directory" {
+    run "./dsh" <<EOF
+cd
+pwd
 exit
 EOF
-
-    echo "Captured stdout:" 
-    echo "Output: $output"
-    echo "Exit Status: $status"
-
     [ "$status" -eq 0 ]
+    [[ "$output" == *"$HOME"* ]]
 }
 
-@test "Check built-in command dragon" {
-    run ./dsh <<EOF
-dragon
+@test "cd to a non-existent directory fails" {
+    run "./dsh" <<EOF
+cd /thisdoesnotexist
+exit
 EOF
-
-    echo "Captured stdout:" 
-    echo "Output: $output"
-    echo "Exit Status: $status"
-
     [ "$status" -eq 0 ]
+    [[ "$output" == *"No such file or directory"* ]]
 }
 
-@test "Check command substitution" {
-    run ./dsh <<EOF
-echo \$(whoami)
+@test "mkdir creates a directory" {
+    run "./dsh" <<EOF
+mkdir testdir
+ls
+exit
 EOF
-
-    echo "Captured stdout:" 
-    echo "Output: $output"
-    echo "Exit Status: $status"
-
     [ "$status" -eq 0 ]
+    [[ "$output" == *"testdir"* ]]
+    rm -r testdir
 }
 
-@test "Check running background process" {
-    run ./dsh <<EOF
-sleep 1 &
+@test "rm removes a file" {
+    touch tempfile.txt
+    run "./dsh" <<EOF
+rm tempfile.txt
+ls
+exit
 EOF
-
-    echo "Captured stdout:" 
-    echo "Output: $output"
-    echo "Exit Status: $status"
-
     [ "$status" -eq 0 ]
+    [[ "$output" != *"tempfile.txt"* ]]
 }
+
+@test "Redirection Test Case" {
+    run "./dsh" <<EOF
+echo "first line" > testfile.txt
+echo "second line" >> testfile.txt
+cat testfile.txt
+exit
+EOF
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"first line"* ]]
+    [[ "$output" == *"second line"* ]]
+    rm -f testfile.txt
+}
+
+@test "Piping test" {
+    touch testfile.txt
+    run "./dsh" <<EOF
+ls | grep testfile.txt
+exit
+EOF
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"testfile.txt"* ]]
+    rm testfile.txt
+}
+
+@test "commands with &&" {
+    run "./dsh" <<EOF
+echo "Hello" && echo "World"
+exit
+EOF
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Hello"* ]]
+    [[ "$output" == *"World"* ]]
+}
+
+@test "Multiple spaces between commands should be ignored" {
+    run "./dsh" <<EOF
+echo      "spaced out"
+exit
+EOF
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"spaced out"* ]]
+}
+
+@test "String with spaces" {
+    run "./dsh" <<EOF
+echo This is a test
+exit
+EOF
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"This is a test"* ]]
+}
+
+
+@test "String with single quotes" {
+    run "./dsh" <<EOF
+echo 'Hello World'
+exit
+EOF
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Hello World"* ]]
+}
+
+
+
+
+
+
 
