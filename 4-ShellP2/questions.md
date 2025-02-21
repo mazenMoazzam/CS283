@@ -63,8 +63,17 @@
 
 - Find and describe three commonly used signals (e.g., SIGKILL, SIGTERM, SIGINT). What are their typical use cases?
 
-    > **Answer**:  _start here_
+    > **Answer**:  Some of the three commonly used signals is the first one being SIGKILL(9), which immediately 
+    terminates a process without cleanup, and the use cases is it to forcefully stop unresponsive applications, in 
+    addition this process cannot be ignored. Another commonoly used signal is SIGTERM(15), which requests a graceful
+    or simple termination of a process or application. Use case involves asking a process to exit gracefully which
+    can allow for cleanup. The last commonly used signal us SIGINT(2) which is used to interrupt a signal, the use case
+    for this is the user requests to process the termination interactively, and this signal can be caugth to perform
+    cleanup before exiting the system.
 
 - What happens when a process receives SIGSTOP? Can it be caught or ignored like SIGINT? Why or why not?
 
-    > **Answer**:  _start here_
+    > **Answer**: When a process receives a SIGSTOP, what happens is that it pauses execution until it receives
+    SIGCONT, this signal cannot be caught, ignored, or blocked. This is because it is enforced by the kernal to 
+    allow an admin or a debugger to suspend or stop the process. The usecase for this signal is to suspend the 
+    process temporarily 
