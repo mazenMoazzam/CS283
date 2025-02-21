@@ -137,6 +137,10 @@ Built_In_Cmds exec_built_in_cmd(cmd_buff_t *cmd) {
                 }
             }
             return BI_EXECUTED;
+
+	case BI_CMD_DRAGON:
+	    print_dragon();
+	    return BI_EXECUTED;
         default:
             return BI_NOT_BI;
     }

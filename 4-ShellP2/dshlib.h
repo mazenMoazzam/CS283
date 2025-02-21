@@ -71,7 +71,7 @@ int exec_cmd(cmd_buff_t *cmd);
 char* skipWhiteSpace(char* str);
 char* processQuoteStrings(char* str, cmd_buff_t *cmd_buff);
 char* processUnquotedStrings(char* str, cmd_buff_t *cmd_buff);
-
+void print_dragon();
 
 //output constants
 #define CMD_OK_HEADER       "PARSED COMMAND LINE - TOTAL COMMANDS %d\n"
