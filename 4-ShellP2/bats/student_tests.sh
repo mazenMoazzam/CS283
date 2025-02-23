@@ -72,3 +72,34 @@ EOF
 }
 
 
+
+
+@test "change to a directory and verify test" {
+    run "./dsh" <<EOF
+cd bats
+pwd
+exit
+EOF
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"/home/mm5622/CS283/CS283/4-ShellP2/bats"* ]]
+    cd ..
+}
+
+
+@test "running a nonexistent command should fail" {
+    run "./dsh" <<EOF
+nonexistentcommand
+exit
+EOF
+    [ "$status" -ne 1 ]
+    [[ "$output" == *"execvp failed: No such file or directory"* ]]
+}
+
+
+@test "dragon command runs" {
+    run "./dsh" <<EOF
+dragon
+exit
+EOF
+    [ "$status" -eq 0 ]
+}
