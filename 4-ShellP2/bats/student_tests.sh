@@ -103,3 +103,41 @@ exit
 EOF
     [ "$status" -eq 0 ]
 }
+
+
+
+@test "exit command terminates the shell" {
+    run "./dsh" <<EOF
+exit
+EOF
+    [ "$status" -eq 0 ]
+}
+
+
+@test "handling of empty command input" {
+    run "./dsh" <<EOF
+
+exit
+EOF
+    [ "$status" -eq 0 ]
+}
+
+@test "running a command with multiple arguments" {
+    run "./dsh" <<EOF
+echo arg1 arg2 arg3
+exit
+EOF
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"arg1 arg2 arg3"* ]]
+}
+
+
+
+@test "running whoami command runs successfully" {
+    run "./dsh" <<EOF
+whoami
+exit
+EOF
+    [ "$status" -eq 0 ]
+    [[ "$output" != "mm5622" ]]
+}
