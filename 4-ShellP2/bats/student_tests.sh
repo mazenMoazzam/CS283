@@ -73,15 +73,15 @@ EOF
 
 
 
-
 @test "change to a directory and verify test" {
+    expectedPath="$(pwd)/bats"  
     run "./dsh" <<EOF
 cd bats
 pwd
 exit
 EOF
     [ "$status" -eq 0 ]
-    [[ "$output" == *"/home/mm5622/CS283/CS283/4-ShellP2/bats"* ]]
+    [[ "$output" == *"$expectedPath"* ]] 
     cd ..
 }
 
@@ -134,10 +134,11 @@ EOF
 
 
 @test "running whoami command runs successfully" {
+    expectedUser=$(whoami)
     run "./dsh" <<EOF
 whoami
 exit
 EOF
     [ "$status" -eq 0 ]
-    [[ "$output" != "mm5622" ]]
+    [[ "$output" == *"$expectedUser"* ]] 
 }
