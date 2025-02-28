@@ -167,13 +167,13 @@ int exec_cmd(cmd_buff_t *cmd) {
 }
 
 int execute_pipeline(command_list_t *clist) {
-    int num_commands = clist->num;
+    int numOfCommands = clist->num;
     int pipefd[2];
     int prev_pipe_read = -1;
-    pid_t pids[num_commands];
+    pid_t pids[numOfCommands];
 
-    for (int i = 0; i < num_commands; i++) {
-        if (i < num_commands - 1) {
+    for (int i = 0; i < numOfCommands; i++) {
+        if (i < numOfCommands - 1) {
             if (pipe(pipefd) == -1) {
                 perror("pipe failed");
                 return ERR_EXEC_CMD;
@@ -187,31 +187,31 @@ int execute_pipeline(command_list_t *clist) {
                 close(prev_pipe_read);
             }
 
-            if (i < num_commands - 1) {
+            if (i < numOfCommands - 1) {
                 dup2(pipefd[1], STDOUT_FILENO);
                 close(pipefd[1]);
                 close(pipefd[0]);
             }
 
             execvp(clist->commands[i].argv[0], clist->commands[i].argv);
-            perror("execvp failed");
+            perror("execvp process has failed");
             exit(ERR_EXEC_CMD);
         } else if (pid > 0) {
             pids[i] = pid;
             if (i > 0) {
                 close(prev_pipe_read);
             }
-            if (i < num_commands - 1) {
+            if (i < numOfCommands - 1) {
                 prev_pipe_read = pipefd[0];
                 close(pipefd[1]);
             }
         } else {
-            perror("fork failed");
+            perror("fork process has failed");
             return ERR_EXEC_CMD;
         }
     }
 
-    for (int i = 0; i < num_commands; i++) {
+    for (int i = 0; i < numOfCommands; i++) {
         int status;
         waitpid(pids[i], &status, 0);
     }
@@ -224,7 +224,6 @@ int execute_pipeline(command_list_t *clist) {
 int exec_local_cmd_loop() {
     char input[SH_CMD_MAX];
     command_list_t clist;
-    
     while (1) {
         printf(SH_PROMPT);
         
@@ -232,8 +231,7 @@ int exec_local_cmd_loop() {
             break;
         }
 
-        input[strcspn(input, "\n")] = 0;  
-        
+        input[strcspn(input, "\n")] = 0;          
         if (build_cmd_list(input, &clist) == OK) {
             if (clist.num == 1) {
                 exec_cmd(&clist.commands[0]);
@@ -245,17 +243,9 @@ int exec_local_cmd_loop() {
     return OK;
 }
 
-
-
-
-
-
-
-
 int build_cmd_list(char *cmd_line, command_list_t *clist) {
     char *command;
     int commandCount = 0;
-
     clist->num = 0;
     memset(clist->commands, 0, sizeof(clist->commands));
 
@@ -267,7 +257,6 @@ int build_cmd_list(char *cmd_line, command_list_t *clist) {
 
     while (command != NULL) {
         char *endOfString = command + strlen(command) - 1;
-
 
         while (*command != '\0' && isspace(*command)) {
             command++;
@@ -286,7 +275,6 @@ int build_cmd_list(char *cmd_line, command_list_t *clist) {
         if (alloc_cmd_buff(&clist->commands[commandCount])) {
             return ERR_MEMORY;
         }
-
    
         if (build_cmd_buff(command, &clist->commands[commandCount])) {
             return ERR_CMD_OR_ARGS_TOO_BIG;
