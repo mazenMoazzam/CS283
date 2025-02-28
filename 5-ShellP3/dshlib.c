@@ -123,6 +123,7 @@ Built_In_Cmds exec_built_in_cmd(cmd_buff_t *cmd) {
 
     switch (match_command(cmd->argv[0])) {
         case BI_CMD_EXIT:
+	    printf("exiting...\n");
             exit(0);
         case BI_CMD_CD:
             if (cmd->argc > 1) {
@@ -218,11 +219,11 @@ int execute_pipeline(command_list_t *clist) {
     return OK;
 }
 
+
+
 int exec_local_cmd_loop() {
     char input[SH_CMD_MAX];
-    cmd_buff_t cmd_buff;
     command_list_t clist;
-    alloc_cmd_buff(&cmd_buff);
     
     while (1) {
         printf(SH_PROMPT);
@@ -232,17 +233,22 @@ int exec_local_cmd_loop() {
         }
 
         input[strcspn(input, "\n")] = 0;  
-        clear_cmd_buff(&cmd_buff);
         
-        if (build_cmd_buff(input, &cmd_buff) == OK) {
-            if (build_cmd_list(input, &clist) == OK) {
+        if (build_cmd_list(input, &clist) == OK) {
+            if (clist.num == 1) {
+                exec_cmd(&clist.commands[0]);
+            } else {
                 execute_pipeline(&clist);
             }
         }
     }
-    free_cmd_buff(&cmd_buff);
     return OK;
 }
+
+
+
+
+
 
 
 
