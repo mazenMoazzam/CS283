@@ -133,6 +133,26 @@ EOF
 }
 
 
+@test "Sorting a list with pipes" {
+    run ./dsh <<EOF
+echo -e "orange\nbanana\napple" | sort
+EOF
+
+    expected_output="apple
+banana
+orange"
+    expected_message="dsh3> dsh3> cmd loop returned 0"
+
+    cleaned_output=$(echo "$output" | sed -n '1,3p')
+
+    [ "$cleaned_output" = "$expected_output" ]
+    [ "$status" -eq 0 ]
+}
+
+
+
+
+
 
 
 
