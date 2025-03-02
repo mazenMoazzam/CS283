@@ -100,3 +100,39 @@ EOF
    
 }
 
+
+
+
+@test "Piping with multiple commands test" {
+    run ./dsh <<EOF
+echo hello | tr a-z A-Z | rev
+EOF
+
+    expected_output="OLLEH"
+    expected_message="dsh3> dsh3> cmd loop returned 0"
+
+    cleaned_output=$(echo "$output" | sed -n '1p')
+
+    [ "$cleaned_output" = "$expected_output" ]
+    [ "$status" -eq 0 ]
+}
+
+
+
+@test "Counting words with pipes" {
+    run ./dsh <<EOF
+echo 'hello world' | wc -w
+EOF
+
+    expected_output="2"
+    expected_message="dsh3> dsh3> cmd loop returned 0"
+    cleaned_output=$(echo "$output" | sed -n '1p')
+
+    [ "$cleaned_output" = "$expected_output" ]
+    [ "$status" -eq 0 ]
+}
+
+
+
+
+
