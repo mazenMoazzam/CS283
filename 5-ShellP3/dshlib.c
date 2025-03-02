@@ -168,13 +168,13 @@ int exec_cmd(cmd_buff_t *cmd) {
 
 int execute_pipeline(command_list_t *clist) {
     int numOfCommands = clist->num;
-    int pipefd[2];
+    int pipeFileDescriptors[2];
     int previousPipeRead = -1;
     pid_t pids[numOfCommands];
 
     for (int i = 0; i < numOfCommands; i++) {
         if (i < numOfCommands - 1) {
-            if (pipe(pipefd) == -1) {
+            if (pipe(pipeFileDescriptors) == -1) {
                 perror("Pipe process failed");
                 return ERR_EXEC_CMD;
             }
@@ -188,9 +188,9 @@ int execute_pipeline(command_list_t *clist) {
             }
 
             if (i < numOfCommands - 1) {
-                dup2(pipefd[1], STDOUT_FILENO);
-                close(pipefd[1]);
-                close(pipefd[0]);
+                dup2(pipeFileDescriptors[1], STDOUT_FILENO);
+                close(pipeFileDescriptors[1]);
+                close(pipeFileDescriptors[0]);
             }
 
             execvp(clist->commands[i].argv[0], clist->commands[i].argv);
@@ -202,8 +202,8 @@ int execute_pipeline(command_list_t *clist) {
                 close(previousPipeRead);
             }
             if (i < numOfCommands - 1) {
-                previousPipeRead = pipefd[0];
-                close(pipefd[1]);
+                previousPipeRead = pipeFileDescriptors[0];
+                close(pipeFileDescriptors[1]);
             }
         } else {
             perror("Fork process has failed");
