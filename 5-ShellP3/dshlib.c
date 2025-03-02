@@ -135,7 +135,6 @@ Built_In_Cmds exec_built_in_cmd(cmd_buff_t *cmd) {
             return BI_EXECUTED;
 
         case BI_CMD_DRAGON:
-            print_dragon();
             return BI_EXECUTED;
         default:
             return BI_NOT_BI;
@@ -235,6 +234,7 @@ int exec_local_cmd_loop() {
         }
 
         input[strcspn(input, "\n")] = 0;
+
         if (build_cmd_list(input, &clist) == OK) {
             if (clist.num == 1) {
                 if (exec_built_in_cmd(&clist.commands[0]) == BI_CMD_EXIT) {
