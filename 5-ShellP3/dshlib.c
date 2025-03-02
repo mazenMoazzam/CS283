@@ -150,7 +150,7 @@ int exec_cmd(cmd_buff_t *cmd) {
     pid_t pid = fork();
     if (pid == 0) {
         execvp(cmd->argv[0], cmd->argv);
-        perror("execvp failed");
+        perror("Execvp failed");
         exit(ERR_EXEC_CMD);
     } else if (pid > 0) {
         int status;
@@ -160,7 +160,7 @@ int exec_cmd(cmd_buff_t *cmd) {
             return WEXITSTATUS(status); 
         }
     } else {
-        perror("fork failed");
+        perror("Fork process failed");
         return ERR_EXEC_CMD;
     }
     return OK;
@@ -169,13 +169,13 @@ int exec_cmd(cmd_buff_t *cmd) {
 int execute_pipeline(command_list_t *clist) {
     int numOfCommands = clist->num;
     int pipefd[2];
-    int prev_pipe_read = -1;
+    int previousPipeRead = -1;
     pid_t pids[numOfCommands];
 
     for (int i = 0; i < numOfCommands; i++) {
         if (i < numOfCommands - 1) {
             if (pipe(pipefd) == -1) {
-                perror("pipe failed");
+                perror("Pipe process failed");
                 return ERR_EXEC_CMD;
             }
         }
@@ -183,8 +183,8 @@ int execute_pipeline(command_list_t *clist) {
         pid_t pid = fork();
         if (pid == 0) {
             if (i > 0) {
-                dup2(prev_pipe_read, STDIN_FILENO);
-                close(prev_pipe_read);
+                dup2(previousPipeRead, STDIN_FILENO);
+                close(previousPipeRead);
             }
 
             if (i < numOfCommands - 1) {
@@ -194,28 +194,29 @@ int execute_pipeline(command_list_t *clist) {
             }
 
             execvp(clist->commands[i].argv[0], clist->commands[i].argv);
-            perror("execvp process has failed");
+            perror("Execvp process has failed");
             exit(ERR_EXEC_CMD);
         } else if (pid > 0) {
             pids[i] = pid;
             if (i > 0) {
-                close(prev_pipe_read);
+                close(previousPipeRead);
             }
             if (i < numOfCommands - 1) {
-                prev_pipe_read = pipefd[0];
+                previousPipeRead = pipefd[0];
                 close(pipefd[1]);
             }
         } else {
-            perror("fork process has failed");
+            perror("Fork process has failed");
             return ERR_EXEC_CMD;
         }
     }
 
+    
+    
     for (int i = 0; i < numOfCommands; i++) {
         int status;
         waitpid(pids[i], &status, 0);
     }
-
     return OK;
 }
 
