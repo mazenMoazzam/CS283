@@ -147,3 +147,83 @@ orange"
     [ "$cleaned_output" = "$expected_output" ]
     [ "$status" -eq 0 ]
 }
+
+
+
+@test "Test output redirection" {
+    run ./dsh <<EOF
+echo "first line" > out.txt
+cat out.txt
+EOF
+    expected_output="first line"    
+    cleaned_output=$(echo "$output" | sed -n '1p')
+    [ "$cleaned_output" = "$expected_output" ]
+    [ "$status" -eq 0 ]
+}
+
+
+
+
+
+
+@test "Test output redirection: Overwrite existing file" {
+    run ./dsh <<EOF
+echo "first line" > testfile.txt
+echo "second line" > testfile.txt
+cat testfile.txt
+EOF
+    expected_output="second line"  
+    cleaned_output=$(echo "$output" | sed -n '1p')
+    [ "$cleaned_output" = "$expected_output" ]
+    [ "$status" -eq 0 ]
+}
+
+
+
+
+
+@test "Test output redirection: Append to file" {
+    run ./dsh <<EOF
+echo "first line" > testfile.txt
+echo "second line" >> testfile.txt
+cat testfile.txt
+EOF
+    expected_output="first line
+second line"
+    cleaned_output=$(echo "$output" | sed -n '1,2p')
+
+    [ "$cleaned_output" = "$expected_output" ]
+    [ "$status" -eq 0 ]
+}
+
+
+@test "Test output redirection: Append empty line" {
+    run ./dsh <<EOF
+echo "line one" > testfile.txt
+echo "" >> testfile.txt
+cat testfile.txt
+EOF
+    expected_output="line one"  
+    cleaned_output=$(echo "$output" | sed -n '1p')
+
+    [ "$cleaned_output" = "$expected_output" ]
+    [ "$status" -eq 0 ]
+}
+
+
+
+
+
+@test "Test input and output redirection together" {
+    run ./dsh <<EOF
+echo "data" > file1.txt
+cat < file1.txt > file2.txt
+cat file2.txt
+EOF
+    expected_output="data"
+    cleaned_output=$(echo "$output" | sed -n '1p')
+
+    [ "$cleaned_output" = "$expected_output" ]
+    [ "$status" -eq 0 ]
+}
+
