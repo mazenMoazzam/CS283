@@ -80,6 +80,10 @@ int build_cmd_buff(char *cmd_line, cmd_buff_t *cmd_buff) {
     }
 
     cmd_buff->argc = 0;
+    cmd_buff->inputFile = NULL;
+    cmd_buff->outputFile = NULL;
+    cmd_buff->outputAppend = 0;
+
     char *commandLineStringPointer = cmd_buff->_cmd_buffer;
 
     while (*commandLineStringPointer != '\0') {
@@ -89,6 +93,49 @@ int build_cmd_buff(char *cmd_line, cmd_buff_t *cmd_buff) {
             break;
         }
 
+        
+        if (*commandLineStringPointer == '<') {
+            *commandLineStringPointer = '\0';
+            commandLineStringPointer++;
+            commandLineStringPointer = skipWhiteSpace(commandLineStringPointer);
+            cmd_buff->inputFile = commandLineStringPointer;
+
+            
+            while (*commandLineStringPointer && !isspace(*commandLineStringPointer)) {
+                commandLineStringPointer++;
+            }
+            if (*commandLineStringPointer) {
+                *commandLineStringPointer = '\0';
+                commandLineStringPointer++;
+            }
+            continue;
+        }
+
+
+        if (*commandLineStringPointer == '>') {
+            *commandLineStringPointer = '\0';
+            commandLineStringPointer++;
+            if (*commandLineStringPointer == '>') {
+                cmd_buff->outputAppend = 1; 
+                commandLineStringPointer++;
+            } else {
+                cmd_buff->outputAppend = 0; 
+            }
+            commandLineStringPointer = skipWhiteSpace(commandLineStringPointer);
+            cmd_buff->outputFile = commandLineStringPointer;
+
+           
+            while (*commandLineStringPointer && !isspace(*commandLineStringPointer)) {
+                commandLineStringPointer++;
+            }
+            if (*commandLineStringPointer) {
+                *commandLineStringPointer = '\0';
+                commandLineStringPointer++;
+            }
+            continue;
+        }
+
+    
         if (*commandLineStringPointer == '\"') {
             commandLineStringPointer = processQuoteStrings(commandLineStringPointer, cmd_buff);
         } else {
@@ -103,6 +150,7 @@ int build_cmd_buff(char *cmd_line, cmd_buff_t *cmd_buff) {
     cmd_buff->argv[cmd_buff->argc] = NULL;
     return OK;
 }
+
 
 Built_In_Cmds match_command(const char *input) {
     if (strcmp(input, "exit") == 0) {
@@ -141,6 +189,8 @@ Built_In_Cmds exec_built_in_cmd(cmd_buff_t *cmd) {
     }
 }
 
+
+
 int exec_cmd(cmd_buff_t *cmd) {
     if (exec_built_in_cmd(cmd) == BI_EXECUTED) {
         return OK;
@@ -148,15 +198,41 @@ int exec_cmd(cmd_buff_t *cmd) {
 
     pid_t pid = fork();
     if (pid == 0) {
+ 
+        if (cmd->inputFile) {
+            int inputFileDirection = open(cmd->inputFile, O_RDONLY);
+            if (inputFileDirection < 0) {
+                perror("Failed to open input file");
+                exit(ERR_EXEC_CMD);
+            }
+            dup2(inputFileDirection, STDIN_FILENO);
+            close(inputFileDirection);
+        }
+
+        if (cmd->outputFile) {
+            int outputFileMode = O_WRONLY | O_CREAT;
+            if (cmd->outputAppend) {
+                outputFileMode = O_WRONLY | O_CREAT | O_APPEND;
+            } else {
+                outputFileMode = O_WRONLY | O_CREAT | O_TRUNC;
+            }
+            int outputFileDirection = open(cmd->outputFile, outputFileMode, FILE_PERMISSIONS);
+            if (outputFileDirection < 0) {
+                perror("Failed to open the file");
+                exit(ERR_EXEC_CMD);
+            }
+            dup2(outputFileDirection, STDOUT_FILENO);
+            close(outputFileDirection);
+        }
         execvp(cmd->argv[0], cmd->argv);
         perror("Execvp failed");
         exit(ERR_EXEC_CMD);
+
     } else if (pid > 0) {
         int status;
         waitpid(pid, &status, 0);
-
         if (WIFEXITED(status)) {
-            return WEXITSTATUS(status); 
+            return WEXITSTATUS(status);
         }
     } else {
         perror("Fork process failed");
@@ -164,6 +240,7 @@ int exec_cmd(cmd_buff_t *cmd) {
     }
     return OK;
 }
+
 
 int execute_pipeline(command_list_t *clist) {
     int numOfCommands = clist->num;
@@ -209,8 +286,6 @@ int execute_pipeline(command_list_t *clist) {
             return ERR_EXEC_CMD;
         }
     }
-
-    
     
     for (int i = 0; i < numOfCommands; i++) {
         int status;

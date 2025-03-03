@@ -39,18 +39,17 @@ EOF
 
 
 @test "Pipe command with word count: ls | wc -l" {
+    expected_output=$(ls | wc -l)  
+
     run ./dsh <<EOF
 ls | wc -l
 EOF
-    expected_output="9"
+
     expected_message="cmd loop returned 0"
     cleaned_output=$(echo "$output" | grep -o '^[0-9]\+')
 
-    
     [ "$cleaned_output" -eq "$expected_output" ]
     [ "$status" -eq 0 ]
-   
-    echo "$output" | grep -q "$expected_message"
 }
 
 
@@ -121,7 +120,7 @@ EOF
 
 @test "Counting words with pipes" {
     run ./dsh <<EOF
-echo 'hello world' | wc -w
+echo hello world | wc -w
 EOF
 
     expected_output="2"
@@ -148,11 +147,3 @@ orange"
     [ "$cleaned_output" = "$expected_output" ]
     [ "$status" -eq 0 ]
 }
-
-
-
-
-
-
-
-

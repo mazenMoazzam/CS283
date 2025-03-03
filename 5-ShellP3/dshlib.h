@@ -21,6 +21,9 @@ typedef struct cmd_buff
     int  argc;
     char *argv[CMD_ARGV_MAX];
     char *_cmd_buffer;
+    char *inputFile;
+    char *outputFile;
+    int outputAppend;
 } cmd_buff_t;
 
 /* WIP - Move to next assignment 
@@ -46,6 +49,7 @@ typedef struct command_list{
 #define SH_PROMPT "dsh3> "
 #define EXIT_CMD "exit"
 #define EXIT_SC     99
+#define FILE_PERMISSIONS 0644
 
 //Standard Return Codes
 #define OK                       0
