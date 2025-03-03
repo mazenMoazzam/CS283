@@ -189,45 +189,57 @@ Built_In_Cmds exec_built_in_cmd(cmd_buff_t *cmd) {
     }
 }
 
+int handleInputRedirection(cmd_buff_t *cmd) {
+    if (cmd->inputFile != NULL) {
+        int inputFileDirection = open(cmd->inputFile, O_RDONLY);
+        if (inputFileDirection < 0) {
+            perror("Failed to open the input file");
+            exit(ERR_EXEC_CMD);
+        }
+        dup2(inputFileDirection, STDIN_FILENO);
+        close(inputFileDirection);
+    }
+    return OK;
+}
+
+
+int handleOutputRedirection(cmd_buff_t *cmd) {
+    if (cmd->outputFile != NULL) {
+        int outputFileMode = O_WRONLY | O_CREAT;
+        if (cmd->outputAppend) {
+            outputFileMode |= O_APPEND;
+        } else {
+            outputFileMode |= O_TRUNC;
+        }
+        int outputFileDirection = open(cmd->outputFile, outputFileMode, FILE_PERMISSIONS);
+        if (outputFileDirection < 0) {
+            perror("Failed to open the file");
+            exit(ERR_EXEC_CMD);
+        }
+        dup2(outputFileDirection, STDOUT_FILENO);
+        close(outputFileDirection);
+    }
+    return OK;
+}
+
+
+void executeProcess(cmd_buff_t *cmd) {
+    handleInputRedirection(cmd);
+    handleOutputRedirection(cmd);
+    execvp(cmd->argv[0], cmd->argv);
+    perror("Execvp has failed");
+    exit(ERR_EXEC_CMD);
+}
+
 
 
 int exec_cmd(cmd_buff_t *cmd) {
     if (exec_built_in_cmd(cmd) == BI_EXECUTED) {
         return OK;
     }
-
     pid_t pid = fork();
     if (pid == 0) {
- 
-        if (cmd->inputFile) {
-            int inputFileDirection = open(cmd->inputFile, O_RDONLY);
-            if (inputFileDirection < 0) {
-                perror("Failed to open input file");
-                exit(ERR_EXEC_CMD);
-            }
-            dup2(inputFileDirection, STDIN_FILENO);
-            close(inputFileDirection);
-        }
-
-        if (cmd->outputFile) {
-            int outputFileMode = O_WRONLY | O_CREAT;
-            if (cmd->outputAppend) {
-                outputFileMode = O_WRONLY | O_CREAT | O_APPEND;
-            } else {
-                outputFileMode = O_WRONLY | O_CREAT | O_TRUNC;
-            }
-            int outputFileDirection = open(cmd->outputFile, outputFileMode, FILE_PERMISSIONS);
-            if (outputFileDirection < 0) {
-                perror("Failed to open the file");
-                exit(ERR_EXEC_CMD);
-            }
-            dup2(outputFileDirection, STDOUT_FILENO);
-            close(outputFileDirection);
-        }
-        execvp(cmd->argv[0], cmd->argv);
-        perror("Execvp failed");
-        exit(ERR_EXEC_CMD);
-
+        executeProcess(cmd);
     } else if (pid > 0) {
         int status;
         waitpid(pid, &status, 0);
@@ -235,7 +247,7 @@ int exec_cmd(cmd_buff_t *cmd) {
             return WEXITSTATUS(status);
         }
     } else {
-        perror("Fork process failed");
+        perror("Fork process has failed");
         return ERR_EXEC_CMD;
     }
     return OK;
