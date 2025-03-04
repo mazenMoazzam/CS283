@@ -260,8 +260,8 @@ int execute_pipeline(command_list_t *clist) {
     int previousPipeRead = -1;
     pid_t pids[numberOfCommands];
 
-    for (int i = 0; i < numberOfCommands; i++) {
-        if (i < numberOfCommands - 1) {
+    for (int currentCommandIndex = 0; currentCommandIndex < numberOfCommands; currentCommandIndex++) {
+        if (currentCommandIndex < numberOfCommands - 1) {
             if (pipe(pipeFileDescriptors) == -1) {
                 perror("Pipe process failed");
                 return ERR_EXEC_CMD;
@@ -270,26 +270,26 @@ int execute_pipeline(command_list_t *clist) {
 
         pid_t pid = fork();
         if (pid == 0) {
-            if (i > 0) {
+            if (currentCommandIndex > 0) {
                 dup2(previousPipeRead, STDIN_FILENO);
                 close(previousPipeRead);
             }
 
-            if (i < numberOfCommands - 1) {
+            if (currentCommandIndex < numberOfCommands - 1) {
                 dup2(pipeFileDescriptors[1], STDOUT_FILENO);
                 close(pipeFileDescriptors[1]);
                 close(pipeFileDescriptors[0]);
             }
 
-            execvp(clist->commands[i].argv[0], clist->commands[i].argv);
+            execvp(clist->commands[currentCommandIndex].argv[0], clist->commands[currentCommandIndex].argv);
             perror("Execvp process has failed");
             exit(ERR_EXEC_CMD);
         } else if (pid > 0) {
-            pids[i] = pid;
-            if (i > 0) {
+            pids[currentCommandIndex] = pid;
+            if (currentCommandIndex > 0) {
                 close(previousPipeRead);
             }
-            if (i < numberOfCommands - 1) {
+            if (currentCommandIndex < numberOfCommands - 1) {
                 previousPipeRead = pipeFileDescriptors[0];
                 close(pipeFileDescriptors[1]);
             }
@@ -299,9 +299,9 @@ int execute_pipeline(command_list_t *clist) {
         }
     }
     
-    for (int i = 0; i < numberOfCommands; i++) {
+    for (int currentChildProcess = 0; currentChildProcess < numberOfCommands; currentChildProcess++) {
         int status;
-        waitpid(pids[i], &status, 0);
+        waitpid(pids[currentChildProcess], &status, 0);
     }
     return OK;
 }
