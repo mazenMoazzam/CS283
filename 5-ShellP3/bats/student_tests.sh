@@ -221,3 +221,44 @@ EOF
 }
 
 
+
+@test "Multiple redirections" {
+    run ./dsh <<EOF
+echo "line one" > file.txt
+echo "line two" >> file.txt
+echo "line three" >> file.txt
+cat file.txt
+EOF
+
+    expected_output="line one
+line two
+line three"
+    cleaned_output=$(echo "$output" | sed -n '1,3p')
+
+    [ "$cleaned_output" = "$expected_output" ]
+    [ "$status" -eq 0 ]
+}
+
+
+
+@test "Exit command" {
+    run ./dsh <<EOF
+exit
+EOF
+
+    [ "$status" -eq 0 ]
+}
+
+
+@test "Command substitution inside pipe" {
+    run ./dsh <<EOF
+echo "The date is $(date)" | grep "date"
+EOF
+
+    expected_output="The date is"
+    cleaned_output=$(echo "$output" | sed -n '1p')
+
+    [[ "$cleaned_output" == *"$expected_output"* ]]
+    [ "$status" -eq 0 ]
+}
+

@@ -255,13 +255,13 @@ int exec_cmd(cmd_buff_t *cmd) {
 
 
 int execute_pipeline(command_list_t *clist) {
-    int numOfCommands = clist->num;
+    int numberOfCommands = clist->num;
     int pipeFileDescriptors[2];
     int previousPipeRead = -1;
-    pid_t pids[numOfCommands];
+    pid_t pids[numberOfCommands];
 
-    for (int i = 0; i < numOfCommands; i++) {
-        if (i < numOfCommands - 1) {
+    for (int i = 0; i < numberOfCommands; i++) {
+        if (i < numberOfCommands - 1) {
             if (pipe(pipeFileDescriptors) == -1) {
                 perror("Pipe process failed");
                 return ERR_EXEC_CMD;
@@ -275,7 +275,7 @@ int execute_pipeline(command_list_t *clist) {
                 close(previousPipeRead);
             }
 
-            if (i < numOfCommands - 1) {
+            if (i < numberOfCommands - 1) {
                 dup2(pipeFileDescriptors[1], STDOUT_FILENO);
                 close(pipeFileDescriptors[1]);
                 close(pipeFileDescriptors[0]);
@@ -289,7 +289,7 @@ int execute_pipeline(command_list_t *clist) {
             if (i > 0) {
                 close(previousPipeRead);
             }
-            if (i < numOfCommands - 1) {
+            if (i < numberOfCommands - 1) {
                 previousPipeRead = pipeFileDescriptors[0];
                 close(pipeFileDescriptors[1]);
             }
@@ -299,7 +299,7 @@ int execute_pipeline(command_list_t *clist) {
         }
     }
     
-    for (int i = 0; i < numOfCommands; i++) {
+    for (int i = 0; i < numberOfCommands; i++) {
         int status;
         waitpid(pids[i], &status, 0);
     }
