@@ -38,16 +38,16 @@ EOF
 
 
 @test "Pipe command with word count: ls | wc -l" {
-    expected_output=$(ls | wc -l)  
+    expectedOutput=$(ls | wc -l)  
 
     run ./dsh <<EOF
 ls | wc -l
 EOF
 
     expected_message="cmd loop returned 0"
-    cleaned_output=$(echo "$output" | grep -o '^[0-9]\+')
+    cleanedOutput=$(echo "$output" | grep -o '^[0-9]\+')
 
-    [ "$cleaned_output" -eq "$expected_output" ]
+    [ "$cleanedOutput" -eq "$expectedOutput" ]
     [ "$status" -eq 0 ]
 }
 
@@ -57,10 +57,10 @@ EOF
 echo test | grep test | wc -l
 EOF
 
-    expected_output="1
+    expectedOutput="1
 dsh3> dsh3> cmd loop returned 0" 
 
-    [ "$output" = "$expected_output" ]
+    [ "$output" = "$expectedOutput" ]
     [ "$status" -eq 0 ]
 }
 
@@ -69,11 +69,10 @@ dsh3> dsh3> cmd loop returned 0"
     run ./dsh <<EOF
 echo "hello" | cat
 EOF
-    expected_output="hello"
-    expected_message="dsh3> dsh3> cmd loop returned 0"
-    cleaned_output=$(echo "$output" | sed -n '1p')  
+    expectedOutput="hello"
+    cleanedOutput=$(echo "$output" | sed -n '1p')  
     
-    [ "$cleaned_output" = "$expected_output" ]
+    [ "$cleanedOutput" = "$expectedOutput" ]
     [ "$status" -eq 0 ]
 }
 
@@ -84,11 +83,10 @@ EOF
 echo start | grep start | wc -c | sort -n
 EOF
 
-    expected_output="6"
-    expected_message="dsh3> dsh3> cmd loop returned 0"
-    cleaned_output=$(echo "$output" | grep -o '^[0-9]\+')
+    expectedOutput="6"
+    cleanedOutput=$(echo "$output" | grep -o '^[0-9]\+')
 
-    [ "$cleaned_output" -eq "$expected_output" ]
+    [ "$cleanedOutput" -eq "$expectedOutput" ]
     [ "$status" -eq 0 ]
    
 }
@@ -99,12 +97,10 @@ EOF
 echo hello | tr a-z A-Z | rev
 EOF
 
-    expected_output="OLLEH"
-    expected_message="dsh3> dsh3> cmd loop returned 0"
+    expectedOutput="OLLEH"
+    cleanedOutput=$(echo "$output" | sed -n '1p')
 
-    cleaned_output=$(echo "$output" | sed -n '1p')
-
-    [ "$cleaned_output" = "$expected_output" ]
+    [ "$cleanedOutput" = "$expectedOutput" ]
     [ "$status" -eq 0 ]
 }
 
@@ -115,11 +111,10 @@ EOF
 echo hello world | wc -w
 EOF
 
-    expected_output="2"
-    expected_message="dsh3> dsh3> cmd loop returned 0"
-    cleaned_output=$(echo "$output" | sed -n '1p')
+    expectedOutput="2"
+    cleanedOutput=$(echo "$output" | sed -n '1p')
 
-    [ "$cleaned_output" = "$expected_output" ]
+    [ "$cleanedOutput" = "$expectedOutput" ]
     [ "$status" -eq 0 ]
 }
 
@@ -129,14 +124,12 @@ EOF
 echo -e "orange\nbanana\napple" | sort
 EOF
 
-    expected_output="apple
+    expectedOutput="apple
 banana
 orange"
-    expected_message="dsh3> dsh3> cmd loop returned 0"
+    cleanedOutput=$(echo "$output" | sed -n '1,3p')
 
-    cleaned_output=$(echo "$output" | sed -n '1,3p')
-
-    [ "$cleaned_output" = "$expected_output" ]
+    [ "$cleanedOutput" = "$expectedOutput" ]
     [ "$status" -eq 0 ]
 }
 
@@ -146,9 +139,9 @@ orange"
 echo "first line" > out.txt
 cat out.txt
 EOF
-    expected_output="first line"    
-    cleaned_output=$(echo "$output" | sed -n '1p')
-    [ "$cleaned_output" = "$expected_output" ]
+    expectedOutput="first line"    
+    cleanedOutput=$(echo "$output" | sed -n '1p')
+    [ "$cleanedOutput" = "$expectedOutput" ]
     [ "$status" -eq 0 ]
 }
 
@@ -159,9 +152,9 @@ echo "first line" > testfile.txt
 echo "second line" > testfile.txt
 cat testfile.txt
 EOF
-    expected_output="second line"  
-    cleaned_output=$(echo "$output" | sed -n '1p')
-    [ "$cleaned_output" = "$expected_output" ]
+    expectedOutput="second line"  
+    cleanedOutput=$(echo "$output" | sed -n '1p')
+    [ "$cleanedOutput" = "$expectedOutput" ]
     [ "$status" -eq 0 ]
 }
 
@@ -172,11 +165,11 @@ echo "first line" > testfile.txt
 echo "second line" >> testfile.txt
 cat testfile.txt
 EOF
-    expected_output="first line
+    expectedOutput="first line
 second line"
-    cleaned_output=$(echo "$output" | sed -n '1,2p')
+    cleanedOutput=$(echo "$output" | sed -n '1,2p')
 
-    [ "$cleaned_output" = "$expected_output" ]
+    [ "$cleanedOutput" = "$expectedOutput" ]
     [ "$status" -eq 0 ]
 }
 
@@ -187,10 +180,10 @@ echo "line one" > testfile.txt
 echo "" >> testfile.txt
 cat testfile.txt
 EOF
-    expected_output="line one"  
-    cleaned_output=$(echo "$output" | sed -n '1p')
+    expectedOutput="line one"  
+    cleanedOutput=$(echo "$output" | sed -n '1p')
 
-    [ "$cleaned_output" = "$expected_output" ]
+    [ "$cleanedOutput" = "$expectedOutput" ]
     [ "$status" -eq 0 ]
 }
 
@@ -201,10 +194,10 @@ echo "data" > file1.txt
 cat < file1.txt > file2.txt
 cat file2.txt
 EOF
-    expected_output="data"
-    cleaned_output=$(echo "$output" | sed -n '1p')
+    expectedOutput="data"
+    cleanedOutput=$(echo "$output" | sed -n '1p')
 
-    [ "$cleaned_output" = "$expected_output" ]
+    [ "$cleanedOutput" = "$expectedOutput" ]
     [ "$status" -eq 0 ]
 }
 
@@ -214,9 +207,9 @@ EOF
 echo -n "" > emptyfile.txt
 cat emptyfile.txt
 EOF
-    cleaned_output=$(echo "$output" | grep -v "dsh3>" | grep -v "cmd loop returned" | tr -d '[:space:]')
+    cleanedOutput=$(echo "$output" | grep -v "dsh3>" | grep -v "cmd loop returned" | tr -d '[:space:]')
 
-    [ -z "$cleaned_output" ]
+    [ -z "$cleanedOutput" ]
     [ "$status" -eq 0 ]
 }
 
@@ -230,12 +223,12 @@ echo "line three" >> file.txt
 cat file.txt
 EOF
 
-    expected_output="line one
+    expectedOutput="line one
 line two
 line three"
-    cleaned_output=$(echo "$output" | sed -n '1,3p')
+    cleanedOutput=$(echo "$output" | sed -n '1,3p')
 
-    [ "$cleaned_output" = "$expected_output" ]
+    [ "$cleanedOutput" = "$expectedOutput" ]
     [ "$status" -eq 0 ]
 }
 
@@ -245,7 +238,6 @@ line three"
     run ./dsh <<EOF
 exit
 EOF
-
     [ "$status" -eq 0 ]
 }
 
@@ -255,10 +247,10 @@ EOF
 echo "The date is $(date)" | grep "date"
 EOF
 
-    expected_output="The date is"
-    cleaned_output=$(echo "$output" | sed -n '1p')
+    expectedOutput="The date is"
+    cleanedOutput=$(echo "$output" | sed -n '1p')
 
-    [[ "$cleaned_output" == *"$expected_output"* ]]
+    [[ "$cleanedOutput" == *"$expectedOutput"* ]]
     [ "$status" -eq 0 ]
 }
 
