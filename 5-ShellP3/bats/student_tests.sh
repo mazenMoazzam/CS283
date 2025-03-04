@@ -44,7 +44,6 @@ EOF
 ls | wc -l
 EOF
 
-    expected_message="cmd loop returned 0"
     cleanedOutput=$(echo "$output" | grep -o '^[0-9]\+')
 
     [ "$cleanedOutput" -eq "$expectedOutput" ]
