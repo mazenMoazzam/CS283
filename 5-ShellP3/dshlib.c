@@ -176,7 +176,6 @@ Built_In_Cmds exec_built_in_cmd(cmd_buff_t *cmd) {
         case BI_CMD_CD:
             if (cmd->argc > 1) {
                 if (chdir(cmd->argv[1]) != 0) {
-                    perror("cd failed");
                     return ERR_EXEC_CMD;
                 }
             }
@@ -193,7 +192,6 @@ int handleInputRedirection(cmd_buff_t *cmd) {
     if (cmd->inputFile != NULL) {
         int inputFileDirection = open(cmd->inputFile, O_RDONLY);
         if (inputFileDirection < 0) {
-            perror("Failed to open the input file");
             exit(ERR_EXEC_CMD);
         }
         dup2(inputFileDirection, STDIN_FILENO);
@@ -213,7 +211,6 @@ int handleOutputRedirection(cmd_buff_t *cmd) {
         }
         int outputFileDirection = open(cmd->outputFile, outputFileMode, FILE_PERMISSIONS);
         if (outputFileDirection < 0) {
-            perror("Failed to open the file");
             exit(ERR_EXEC_CMD);
         }
         dup2(outputFileDirection, STDOUT_FILENO);
@@ -227,7 +224,6 @@ void executeProcess(cmd_buff_t *cmd) {
     handleInputRedirection(cmd);
     handleOutputRedirection(cmd);
     execvp(cmd->argv[0], cmd->argv);
-    perror("Execvp has failed");
     exit(ERR_EXEC_CMD);
 }
 
@@ -247,7 +243,6 @@ int exec_cmd(cmd_buff_t *cmd) {
             return WEXITSTATUS(status);
         }
     } else {
-        perror("Fork process has failed");
         return ERR_EXEC_CMD;
     }
     return OK;
@@ -263,7 +258,6 @@ int execute_pipeline(command_list_t *clist) {
     for (int currentCommandIndex = 0; currentCommandIndex < numberOfCommands; currentCommandIndex++) {
         if (currentCommandIndex < numberOfCommands - 1) {
             if (pipe(pipeFileDescriptors) == -1) {
-                perror("Pipe process failed");
                 return ERR_EXEC_CMD;
             }
         }
@@ -282,7 +276,6 @@ int execute_pipeline(command_list_t *clist) {
             }
 
             execvp(clist->commands[currentCommandIndex].argv[0], clist->commands[currentCommandIndex].argv);
-            perror("Execvp process has failed");
             exit(ERR_EXEC_CMD);
         } else if (pid > 0) {
             pids[currentCommandIndex] = pid;
@@ -294,7 +287,6 @@ int execute_pipeline(command_list_t *clist) {
                 close(pipeFileDescriptors[1]);
             }
         } else {
-            perror("Fork process has failed");
             return ERR_EXEC_CMD;
         }
     }
