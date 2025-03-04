@@ -37,7 +37,6 @@ EOF
 }
 
 
-
 @test "Pipe command with word count: ls | wc -l" {
     expected_output=$(ls | wc -l)  
 
@@ -53,8 +52,6 @@ EOF
 }
 
 
-
-
 @test "Chained pipe command: echo test | grep test | wc -l" {
     run ./dsh <<EOF
 echo test | grep test | wc -l
@@ -66,8 +63,6 @@ dsh3> dsh3> cmd loop returned 0"
     [ "$output" = "$expected_output" ]
     [ "$status" -eq 0 ]
 }
-
-
 
 
 @test "Pipe command with cat: echo 'hello' | cat" {
@@ -84,7 +79,6 @@ EOF
 
 
 
-
 @test "Command test: echo start | grep start | wc -c | sort -n" {
     run ./dsh <<EOF
 echo start | grep start | wc -c | sort -n
@@ -98,8 +92,6 @@ EOF
     [ "$status" -eq 0 ]
    
 }
-
-
 
 
 @test "Piping with multiple commands test" {
@@ -149,7 +141,6 @@ orange"
 }
 
 
-
 @test "Test output redirection" {
     run ./dsh <<EOF
 echo "first line" > out.txt
@@ -160,10 +151,6 @@ EOF
     [ "$cleaned_output" = "$expected_output" ]
     [ "$status" -eq 0 ]
 }
-
-
-
-
 
 
 @test "Test output redirection: Overwrite existing file" {
@@ -177,9 +164,6 @@ EOF
     [ "$cleaned_output" = "$expected_output" ]
     [ "$status" -eq 0 ]
 }
-
-
-
 
 
 @test "Test output redirection: Append to file" {
@@ -211,9 +195,6 @@ EOF
 }
 
 
-
-
-
 @test "Test input and output redirection together" {
     run ./dsh <<EOF
 echo "data" > file1.txt
@@ -226,4 +207,17 @@ EOF
     [ "$cleaned_output" = "$expected_output" ]
     [ "$status" -eq 0 ]
 }
+
+
+@test "Test output redirection: Empty string to file" {
+    run ./dsh <<EOF
+echo -n "" > emptyfile.txt
+cat emptyfile.txt
+EOF
+    cleaned_output=$(echo "$output" | grep -v "dsh3>" | grep -v "cmd loop returned" | tr -d '[:space:]')
+
+    [ -z "$cleaned_output" ]
+    [ "$status" -eq 0 ]
+}
+
 
