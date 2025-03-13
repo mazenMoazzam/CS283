@@ -111,6 +111,7 @@ int exec_remote_cmd_loop(char *address, int port)
 	}
 
 	cmd_buff[strcspn(cmd_buff, "\n")] = '\0';
+	printf("Client sending command: %s\n", cmd_buff);
 	if (send(cli_socket, cmd_buff, strlen(cmd_buff) + 1, 0) < 0) {
 		return client_cleanup(cli_socket, cmd_buff, rsp_buff, ERR_RDSH_COMMUNICATION);
 	}
@@ -123,6 +124,7 @@ int exec_remote_cmd_loop(char *address, int port)
 			rsp_buff[io_size - 1] = '\0';
 
 		}
+		printf("Client received: %.*s\n", (int)io_size, rsp_buff);
 		printf("%.*s", (int)io_size, rsp_buff);
 		if (is_eof) {
 			break;

@@ -313,12 +313,14 @@ int exec_client_requests(int cli_socket) {
         // Null-terminate the command
         io_buff[io_size - 1] = '\0';
 
+	printf("Server recieved command: %s\n", io_buff);
         // Build the command list
         if (build_cmd_list(io_buff, &cmd_list) != OK) {
             send_message_string(cli_socket, "Error: Invalid command\n");
             continue;
         }
 
+	printf("Server parsed command: %s\n", cmd_list.commands[0].argv[0]);
         // Execute the command pipeline
         rc = rsh_execute_pipeline(cli_socket, &cmd_list);
 
