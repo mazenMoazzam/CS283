@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <sys/un.h>
 #include <fcntl.h>
+#include <signal.h>
+#include <pthread.h>
 
 //INCLUDES for extra credit
 //#include <signal.h>
@@ -82,7 +84,7 @@ int stop_server(int svr_socket){
 
 /*
  * boot_server(ifaces, port)
- *      ifaces & port:  see start_server for description.  They are passed
+ *      ifaces & port:  see start_server for description.They are passed
  *                      as is to this function.   
  * 
  *      This function "boots" the rsh server.  It is responsible for all
