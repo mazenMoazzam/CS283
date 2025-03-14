@@ -7,8 +7,6 @@
 #include <unistd.h>
 #include <sys/un.h>
 #include <fcntl.h>
-#include <signal.h>
-#include <pthread.h>
 
 //INCLUDES for extra credit
 //#include <signal.h>
@@ -55,8 +53,7 @@ int start_server(char *ifaces, int port, int is_threaded){
     //TODO:  If you are implementing the extra credit, please add logic
     //       to keep track of is_threaded to handle this feature
     //
-    
-    (void)is_threaded;
+
     svr_socket = boot_server(ifaces, port);
     if (svr_socket < 0){
         int err_code = svr_socket;  //server socket will carry error code
@@ -85,7 +82,7 @@ int stop_server(int svr_socket){
 
 /*
  * boot_server(ifaces, port)
- *      ifaces & port:  see start_server for description.They are passed
+ *      ifaces & port:  see start_server for description.  They are passed
  *                      as is to this function.   
  * 
  *      This function "boots" the rsh server.  It is responsible for all
@@ -116,65 +113,27 @@ int stop_server(int svr_socket){
  *                               bind(), or listen() call fails. 
  * 
  */
-int boot_server(char *ifaces, int port) {
+int boot_server(char *ifaces, int port){
     int svr_socket;
     int ret;
+    
     struct sockaddr_in addr;
 
-    
-    svr_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (svr_socket < 0) {
-        perror("socket");
-        return ERR_RDSH_COMMUNICATION;
-    }
+    // TODO set up the socket - this is very similar to the demo code
 
-    
-    int enable = 1;
-    if (setsockopt(svr_socket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
-        perror("setsockopt");
-        close(svr_socket);
-        return ERR_RDSH_COMMUNICATION;
-    }
-
-
-    memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(port);
-    if (inet_pton(AF_INET, ifaces, &addr.sin_addr) <= 0) {
-        perror("inet_pton");
-        close(svr_socket);
-        return ERR_RDSH_COMMUNICATION;
-    }
-
-    if (bind(svr_socket, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-        perror("bind");
-        close(svr_socket);
-        return ERR_RDSH_COMMUNICATION;
-    }
-
+    /*
+     * Prepare for accepting connections. The backlog size is set
+     * to 20. So while one request is being processed other requests
+     * can be waiting.
+     */
     ret = listen(svr_socket, 20);
     if (ret == -1) {
         perror("listen");
-        close(svr_socket);
         return ERR_RDSH_COMMUNICATION;
     }
 
     return svr_socket;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /*
  * process_cli_requests(svr_socket)
@@ -217,40 +176,18 @@ int boot_server(char *ifaces, int port) {
  *                connections, and negative values terminate the server. 
  * 
  */
-int process_cli_requests(int svr_socket) {
-    int cli_socket;
-    int rc = OK;
-    struct sockaddr_in cli_addr;
-    socklen_t cli_len = sizeof(cli_addr);
+int process_cli_requests(int svr_socket){
+    int     cli_socket;
+    int     rc = OK;    
 
-    while (1) {
-        cli_socket = accept(svr_socket, (struct sockaddr *)&cli_addr, &cli_len);
-        if (cli_socket < 0) {
-            perror("accept");
-            return ERR_RDSH_COMMUNICATION;
-        }
-
-    
-        rc = exec_client_requests(cli_socket);
-        if (rc == OK_EXIT) {
-            break; 
-        }
-        close(cli_socket);
+    while(1){
+        // TODO use the accept syscall to create cli_socket 
+        // and then exec_client_requests(cli_socket)
     }
 
+    stop_server(cli_socket);
     return rc;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 /*
  * exec_client_requests(cli_socket)
@@ -294,68 +231,35 @@ int process_cli_requests(int svr_socket) {
  *                or receive errors. 
  */
 int exec_client_requests(int cli_socket) {
-    char *io_buff = malloc(RDSH_COMM_BUFF_SZ);
+    int io_size;
     command_list_t cmd_list;
     int rc;
+    int cmd_rc;
+    int last_rc;
+    char *io_buff;
 
-    if (!io_buff) {
+    io_buff = malloc(RDSH_COMM_BUFF_SZ);
+    if (io_buff == NULL){
         return ERR_RDSH_SERVER;
     }
 
-    while (1) {
-        // Receive a command from the client
-        ssize_t io_size = recv(cli_socket, io_buff, RDSH_COMM_BUFF_SZ, 0);
-        if (io_size <= 0) {
-            free(io_buff);
-            return ERR_RDSH_COMMUNICATION;
-        }
+    while(1) {
+        // TODO use recv() syscall to get input
 
-        // Null-terminate the command
-        io_buff[io_size - 1] = '\0';
+        // TODO build up a cmd_list
 
-	printf("Server recieved command: %s\n", io_buff);
-        // Build the command list
-        if (build_cmd_list(io_buff, &cmd_list) != OK) {
-            send_message_string(cli_socket, "Error: Invalid command\n");
-            continue;
-        }
+        // TODO rsh_execute_pipeline to run your cmd_list
 
-	printf("Server parsed command: %s\n", cmd_list.commands[0].argv[0]);
-        // Execute the command pipeline
-        rc = rsh_execute_pipeline(cli_socket, &cmd_list);
+        // TODO send appropriate respones with send_message_string
+        // - error constants for failures
+        // - buffer contents from execute commands
+        //  - etc.
 
-        // Handle built-in commands
-        if (rc == BI_CMD_EXIT) {
-            break; // Exit the client loop
-        } else if (rc == BI_CMD_STOP_SVR) {
-            free(io_buff);
-            return OK_EXIT; // Stop the server
-        }
-
-        // Send EOF to indicate the end of the response
-        send_message_eof(cli_socket);
+        // TODO send_message_eof when done
     }
 
-    free(io_buff);
-    return OK;
+    return WARN_RDSH_NOT_IMPL;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /*
  * send_message_eof(cli_socket)
@@ -371,15 +275,17 @@ int exec_client_requests(int cli_socket) {
  *      ERR_RDSH_COMMUNICATION:  The send() socket call returned an error or if
  *           we were unable to send the EOF character. 
  */
-int send_message_eof(int cli_socket) {
-    int sent_len = send(cli_socket, &RDSH_EOF_CHAR, 1, 0);
+int send_message_eof(int cli_socket){
+    int send_len = (int)sizeof(RDSH_EOF_CHAR);
+    int sent_len;
+    sent_len = send(cli_socket, &RDSH_EOF_CHAR, send_len, 0);
 
-    if (sent_len != 1) {
+    if (sent_len != send_len){
         return ERR_RDSH_COMMUNICATION;
     }
-
     return OK;
 }
+
 
 /*
  * send_message_string(cli_socket, char *buff)
@@ -399,26 +305,10 @@ int send_message_eof(int cli_socket) {
  *      ERR_RDSH_COMMUNICATION:  The send() socket call returned an error or if
  *           we were unable to send the message followed by the EOF character. 
  */
-int send_message_string(int cli_socket, char *buff) {
-    int send_len = strlen(buff) + 1; // Include null terminator
-    int sent_len = send(cli_socket, buff, send_len, 0);
-
-    if (sent_len != send_len) {
-        return ERR_RDSH_COMMUNICATION;
-    }
-
-    return send_message_eof(cli_socket);
+int send_message_string(int cli_socket, char *buff){
+    //TODO implement writing to cli_socket with send()
+    return WARN_RDSH_NOT_IMPL;
 }
-
-
-
-
-
-
-
-
-
-
 
 
 /*
@@ -462,50 +352,25 @@ int send_message_string(int cli_socket, char *buff) {
 int rsh_execute_pipeline(int cli_sock, command_list_t *clist) {
     int pipes[clist->num - 1][2];  // Array of pipes
     pid_t pids[clist->num];
-    int pids_st[clist->num];       // Array to store process statuses
+    int  pids_st[clist->num];         // Array to store process IDs
+    Built_In_Cmds bi_cmd;
     int exit_code;
 
     // Create all necessary pipes
     for (int i = 0; i < clist->num - 1; i++) {
         if (pipe(pipes[i]) == -1) {
             perror("pipe");
-            return ERR_RDSH_CMD_EXEC;
+            exit(EXIT_FAILURE);
         }
     }
 
     for (int i = 0; i < clist->num; i++) {
-        pids[i] = fork();
-        if (pids[i] == 0) { // Child process
-            // Redirect input
-            if (i > 0) {
-                dup2(pipes[i - 1][0], STDIN_FILENO);
-            } else {
-                dup2(cli_sock, STDIN_FILENO); // First command reads from client socket
-            }
+        // TODO this is basically the same as the piped fork/exec assignment, except for where you connect the begin and end of the pipeline (hint: cli_sock)
 
-            // Redirect output
-            if (i < clist->num - 1) {
-                dup2(pipes[i][1], STDOUT_FILENO);
-            } else {
-                dup2(cli_sock, STDOUT_FILENO); // Last command writes to client socket
-                dup2(cli_sock, STDERR_FILENO); // Redirect stderr to client socket
-            }
+        // TODO HINT you can dup2(cli_sock with STDIN_FILENO, STDOUT_FILENO, etc.
 
-            // Close all pipe ends
-            for (int j = 0; j < clist->num - 1; j++) {
-                close(pipes[j][0]);
-                close(pipes[j][1]);
-            }
-
-            // Execute the command
-            execvp(clist->commands[i].argv[0], clist->commands[i].argv);
-            perror("execvp");
-            exit(ERR_RDSH_CMD_EXEC);
-        } else if (pids[i] < 0) {
-            perror("fork");
-            return ERR_RDSH_CMD_EXEC;
-        }
     }
+
 
     // Parent process: close all pipe ends
     for (int i = 0; i < clist->num - 1; i++) {
@@ -513,27 +378,22 @@ int rsh_execute_pipeline(int cli_sock, command_list_t *clist) {
         close(pipes[i][1]);
     }
 
-    // Wait for all child processes
+    // Wait for all children
     for (int i = 0; i < clist->num; i++) {
         waitpid(pids[i], &pids_st[i], 0);
     }
 
-    // Return the exit code of the last command
+    //by default get exit code of last process
+    //use this as the return value
     exit_code = WEXITSTATUS(pids_st[clist->num - 1]);
+    for (int i = 0; i < clist->num; i++) {
+        //if any commands in the pipeline are EXIT_SC
+        //return that to enable the caller to react
+        if (WEXITSTATUS(pids_st[i]) == EXIT_SC)
+            exit_code = EXIT_SC;
+    }
     return exit_code;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 /**************   OPTIONAL STUFF  ***************/
 /****
