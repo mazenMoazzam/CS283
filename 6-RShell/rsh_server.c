@@ -36,13 +36,11 @@
 int start_server(char *ifaces, int port, int is_threaded) {
     int svr_socket;
     int rc;
-
-    // Suppress unused parameter warning
     (void)is_threaded;
 
     svr_socket = boot_server(ifaces, port);
     if (svr_socket < 0) {
-        int err_code = svr_socket;  // server socket will carry error code
+        int err_code = svr_socket;  
         return err_code;
     }
 
@@ -77,15 +75,13 @@ int boot_server(char *ifaces, int port) {
     int svr_socket;
     int ret;
     struct sockaddr_in addr;
-
-    // Create the server socket
     svr_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (svr_socket < 0) {
         perror("socket");
         return ERR_RDSH_COMMUNICATION;
     }
 
-    // Allow reuse of the port (useful during development)
+   
     int enable = 1;
     if (setsockopt(svr_socket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
         perror("setsockopt");
@@ -93,7 +89,6 @@ int boot_server(char *ifaces, int port) {
         return ERR_RDSH_COMMUNICATION;
     }
 
-    // Set up the server address
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
@@ -102,16 +97,12 @@ int boot_server(char *ifaces, int port) {
         close(svr_socket);
         return ERR_RDSH_COMMUNICATION;
     }
-
-    // Bind the socket to the address and port
     ret = bind(svr_socket, (struct sockaddr *)&addr, sizeof(addr));
     if (ret < 0) {
         perror("bind");
         close(svr_socket);
         return ERR_RDSH_COMMUNICATION;
     }
-
-    // Start listening for client connections
     ret = listen(svr_socket, 20);
     if (ret < 0) {
         perror("listen");
@@ -135,22 +126,17 @@ int process_cli_requests(int svr_socket) {
     int rc = OK;
 
     while (1) {
-        // Accept a client connection
+
         cli_socket = accept(svr_socket, (struct sockaddr *)&cli_addr, &cli_len);
         if (cli_socket < 0) {
             perror("accept");
             return ERR_RDSH_COMMUNICATION;
         }
-
-        // Handle client requests
         rc = exec_client_requests(cli_socket);
         if (rc == OK_EXIT) {
-            // Client requested server to stop
             close(cli_socket);
             break;
         }
-
-        // Close the client socket after handling requests
         close(cli_socket);
     }
 
@@ -168,63 +154,59 @@ int exec_client_requests(int cli_socket) {
     command_list_t cmd_list;
     int rc;
     char *io_buff;
-
-    // Allocate a buffer for receiving commands
     io_buff = malloc(RDSH_COMM_BUFF_SZ);
     if (!io_buff) {
         return ERR_RDSH_SERVER;
     }
 
     while (1) {
-        // Receive the command from the client
         io_size = recv(cli_socket, io_buff, RDSH_COMM_BUFF_SZ, 0);
         if (io_size < 0) {
             perror("recv");
             free(io_buff);
             return ERR_RDSH_COMMUNICATION;
         } else if (io_size == 0) {
-            // Client disconnected
             free(io_buff);
             return OK;
         }
-
-        // Null-terminate the received command
         io_buff[io_size] = '\0';
-
-        // Parse the command into a command list
         rc = build_cmd_list(io_buff, &cmd_list);
         if (rc < 0) {
-            // Handle parsing errors
             send_message_string(cli_socket, CMD_ERR_RDSH_EXEC);
             send_message_eof(cli_socket);
             continue;
         }
 
-        // Handle built-in commands
+        
         Built_In_Cmds bi_cmd = rsh_built_in_cmd(&cmd_list.commands[0]);
         if (bi_cmd == BI_CMD_EXIT) {
-            // Client requested to exit
             free(io_buff);
             return OK;
         } else if (bi_cmd == BI_CMD_STOP_SVR) {
-            // Client requested server to stop
+            
             free(io_buff);
             return OK_EXIT;
         } else if (bi_cmd == BI_EXECUTED) {
-            // Built-in command executed (e.g., cd)
+          
             send_message_eof(cli_socket);
             continue;
         }
 
-        // Execute the command pipeline
+        
         rc = rsh_execute_pipeline(cli_socket, &cmd_list);
         if (rc < 0) {
-            // Handle execution errors
+           
             send_message_string(cli_socket, CMD_ERR_RDSH_EXEC);
         }
 
-        // Send EOF to indicate end of response
-        send_message_eof(cli_socket);
+        
+        rc = send_message_eof(cli_socket);
+        if (rc != OK) {
+            printf(CMD_ERR_RDSH_COMM);
+            free(io_buff);
+            close(cli_socket);
+            return ERR_RDSH_COMMUNICATION;
+        }
     }
 
     free(io_buff);
@@ -240,12 +222,10 @@ int exec_client_requests(int cli_socket) {
  *  This function executes the command pipeline.
  */
 int rsh_execute_pipeline(int cli_sock, command_list_t *clist) {
-    int pipes[clist->num - 1][2];  // Array of pipes
+    int pipes[clist->num - 1][2];  
     pid_t pids[clist->num];
-    int pids_st[clist->num];       // Array to store process statuses
+    int pids_st[clist->num];       
     int exit_code;
-
-    // Create pipes for the pipeline
     for (int i = 0; i < clist->num - 1; i++) {
         if (pipe(pipes[i]) == -1) {
             perror("pipe");
@@ -253,55 +233,52 @@ int rsh_execute_pipeline(int cli_sock, command_list_t *clist) {
         }
     }
 
-    // Fork and execute each command in the pipeline
     for (int i = 0; i < clist->num; i++) {
         pids[i] = fork();
         if (pids[i] < 0) {
             perror("fork");
             return ERR_RDSH_COMMUNICATION;
         } else if (pids[i] == 0) {
-            // Child process
             if (i > 0) {
-                // Redirect stdin from the previous pipe
+                
                 dup2(pipes[i - 1][0], STDIN_FILENO);
             } else {
-                // First process: redirect stdin from the client socket
                 dup2(cli_sock, STDIN_FILENO);
             }
 
             if (i < clist->num - 1) {
-                // Redirect stdout to the next pipe
+                
                 dup2(pipes[i][1], STDOUT_FILENO);
             } else {
-                // Last process: redirect stdout to the client socket
-                dup2(cli_sock, STDOUT_FILENO);
+                if (!clist->commands[i].outputFile) {
+                    dup2(cli_sock, STDOUT_FILENO);
+                    dup2(cli_sock, STDERR_FILENO);
+                }
             }
 
-            // Close all pipe ends
+            
             for (int j = 0; j < clist->num - 1; j++) {
                 close(pipes[j][0]);
                 close(pipes[j][1]);
             }
 
-            // Execute the command
+        
             execvp(clist->commands[i].argv[0], clist->commands[i].argv);
             perror("execvp");
             exit(EXIT_FAILURE);
         }
     }
 
-    // Parent process: close all pipe ends
     for (int i = 0; i < clist->num - 1; i++) {
         close(pipes[i][0]);
         close(pipes[i][1]);
     }
 
-    // Wait for all child processes to finish
+   
     for (int i = 0; i < clist->num; i++) {
         waitpid(pids[i], &pids_st[i], 0);
+   
     }
-
-    // Get the exit code of the last process in the pipeline
     exit_code = WEXITSTATUS(pids_st[clist->num - 1]);
     return exit_code;
 }
@@ -333,27 +310,29 @@ int send_message_eof(int cli_socket) {
  */
 int send_message_string(int cli_socket, char *buff) {
     int sent_len;
-
-    // Send the message
     sent_len = send(cli_socket, buff, strlen(buff), 0);
     if (sent_len < 0) {
         perror("send");
         return ERR_RDSH_COMMUNICATION;
     }
-
-    // Send the EOF character
     return send_message_eof(cli_socket);
 }
 
+/*
+ * rsh_built_in_cmd(cmd_buff_t *cmd)
+ *      cmd:  The cmd_buff_t of the command, remember, this is the 
+ *            parsed version of the command
+ *   
+ *  This function checks if the command is built-in or not. If it is,
+ *  it handles the execution of the built-in command.
+ */
 Built_In_Cmds rsh_built_in_cmd(cmd_buff_t *cmd) {
     if (cmd->argc == 0) {
         return BI_NOT_BI;
     }
 
     if (strcmp(cmd->argv[0], "cd") == 0) {
-        // Handle cd command
         if (cmd->argc < 2) {
-            // No directory provided, default to home directory
             chdir(getenv("HOME"));
         } else {
             if (chdir(cmd->argv[1]) < 0) {
@@ -362,13 +341,9 @@ Built_In_Cmds rsh_built_in_cmd(cmd_buff_t *cmd) {
         }
         return BI_EXECUTED;
     } else if (strcmp(cmd->argv[0], "exit") == 0) {
-        // Handle exit command
         return BI_CMD_EXIT;
     } else if (strcmp(cmd->argv[0], "stop-server") == 0) {
-        // Handle stop-server command
         return BI_CMD_STOP_SVR;
     }
-
-    // Command is not built-in
     return BI_NOT_BI;
 }
