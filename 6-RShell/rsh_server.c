@@ -34,21 +34,21 @@
  *          3. Stopping the server. 
  */
 int start_server(char *ifaces, int port, int is_threaded) {
-    int svr_socket;
-    int rc;
+    int serverSocket;
+    int returnCode;
     (void)is_threaded;
 
-    svr_socket = boot_server(ifaces, port);
-    if (svr_socket < 0) {
-        int err_code = svr_socket;  
-        return err_code;
+    serverSocket = boot_server(ifaces, port);
+    
+    if (serverSocket < 0) {
+        int errorCode = serverSocket;  
+        return errorCode;
     }
 
-    rc = process_cli_requests(svr_socket);
 
-    stop_server(svr_socket);
-
-    return rc;
+    returnCode = process_cli_requests(serverSocket);
+    stop_server(serverSocket);
+    return returnCode;
 }
 
 /*
@@ -77,14 +77,12 @@ int boot_server(char *ifaces, int port) {
     struct sockaddr_in addr;
     svr_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (svr_socket < 0) {
-        perror("socket");
         return ERR_RDSH_COMMUNICATION;
     }
 
    
     int enable = 1;
     if (setsockopt(svr_socket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
-        perror("setsockopt");
         close(svr_socket);
         return ERR_RDSH_COMMUNICATION;
     }
@@ -92,20 +90,20 @@ int boot_server(char *ifaces, int port) {
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
+
     if (inet_pton(AF_INET, ifaces, &addr.sin_addr) <= 0) {
-        perror("inet_pton");
         close(svr_socket);
         return ERR_RDSH_COMMUNICATION;
     }
+
     ret = bind(svr_socket, (struct sockaddr *)&addr, sizeof(addr));
     if (ret < 0) {
-        perror("bind");
         close(svr_socket);
         return ERR_RDSH_COMMUNICATION;
     }
+    
     ret = listen(svr_socket, 20);
     if (ret < 0) {
-        perror("listen");
         close(svr_socket);
         return ERR_RDSH_COMMUNICATION;
     }
@@ -129,7 +127,6 @@ int process_cli_requests(int svr_socket) {
 
         cli_socket = accept(svr_socket, (struct sockaddr *)&cli_addr, &cli_len);
         if (cli_socket < 0) {
-            perror("accept");
             return ERR_RDSH_COMMUNICATION;
         }
         rc = exec_client_requests(cli_socket);
@@ -162,7 +159,6 @@ int exec_client_requests(int cli_socket) {
     while (1) {
         io_size = recv(cli_socket, io_buff, RDSH_COMM_BUFF_SZ, 0);
         if (io_size < 0) {
-            perror("recv");
             free(io_buff);
             return ERR_RDSH_COMMUNICATION;
         } else if (io_size == 0) {
@@ -228,7 +224,6 @@ int rsh_execute_pipeline(int cli_sock, command_list_t *clist) {
     int exit_code;
     for (int i = 0; i < clist->num - 1; i++) {
         if (pipe(pipes[i]) == -1) {
-            perror("pipe");
             return ERR_RDSH_COMMUNICATION;
         }
     }
@@ -236,7 +231,6 @@ int rsh_execute_pipeline(int cli_sock, command_list_t *clist) {
     for (int i = 0; i < clist->num; i++) {
         pids[i] = fork();
         if (pids[i] < 0) {
-            perror("fork");
             return ERR_RDSH_COMMUNICATION;
         } else if (pids[i] == 0) {
             if (i > 0) {
@@ -264,7 +258,6 @@ int rsh_execute_pipeline(int cli_sock, command_list_t *clist) {
 
         
             execvp(clist->commands[i].argv[0], clist->commands[i].argv);
-            perror("execvp");
             exit(EXIT_FAILURE);
         }
     }
@@ -312,7 +305,6 @@ int send_message_string(int cli_socket, char *buff) {
     int sent_len;
     sent_len = send(cli_socket, buff, strlen(buff), 0);
     if (sent_len < 0) {
-        perror("send");
         return ERR_RDSH_COMMUNICATION;
     }
     return send_message_eof(cli_socket);
