@@ -14,7 +14,7 @@ EOF
 }
 
 
-@test "Client exits gracefully with 'exit' command" {
+@test "Client exits with exit command" {
     ./dsh -s -i 127.0.0.1 -p 12345 &
     server_pid=$!
     sleep 1
@@ -30,7 +30,7 @@ EOF
 }
 
 
-@test "Server changes directory with 'cd' command" {
+@test "Server changes directory with cd command" {
     ./dsh -s -i 127.0.0.1 -p 12345 &
     server_pid=$!
     sleep 1
@@ -95,7 +95,7 @@ EOF
 }
 
 
-@test "Server executes simple command (ls)" {
+@test "Server executes simple command" {
     ./dsh -s -i 127.0.0.1 -p 12345 &
     server_pid=$!
     sleep 1
@@ -109,7 +109,7 @@ EOF
 
 
 
-@test "Server executes command with arguments (ls -l)" {
+@test "Server executes command with arguments" {
     ./dsh -s -i 127.0.0.1 -p 12345 &
     server_pid=$!
     sleep 1
@@ -122,7 +122,7 @@ EOF
     kill $server_pid
 }
 
-@test "Local execution: basic command (ls)" {
+@test "Local execution: basic command" {
     run ./dsh <<EOF
 ls
 EOF
@@ -133,7 +133,7 @@ EOF
 }
 
 
-@test "Local execution: output redirection (echo > file)" {
+@test "Local execution: output redirection" {
     run ./dsh <<EOF
 echo "Hello, World!" > /tmp/test_output.txt
 cat /tmp/test_output.txt
@@ -143,7 +143,7 @@ EOF
     rm -f /tmp/test_output.txt
 }
 
-@test "Local execution: command with pipes (echo | grep)" {
+@test "Local execution: command with pipes" {
     run ./dsh <<EOF
 echo "Hello, World!" | grep "World"
 EOF
