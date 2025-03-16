@@ -326,24 +326,45 @@ int send_message_string(int cli_socket, char *buff) {
  *  This function checks if the command is built-in or not. If it is,
  *  it handles the execution of the built-in command.
  */
-Built_In_Cmds rsh_built_in_cmd(cmd_buff_t *cmd) {
-    if (cmd->argc == 0) {
+Built_In_Cmds rsh_built_in_cmd(cmd_buff_t *cmd)
+{
+    Built_In_Cmds ctype = BI_NOT_BI;
+    ctype = rsh_match_command(cmd->argv[0]);
+
+    switch (ctype)
+    {
+    // case BI_CMD_DRAGON:
+    //     print_dragon();
+    //     return BI_EXECUTED;
+    case BI_CMD_EXIT:
+        return BI_CMD_EXIT;
+    case BI_CMD_STOP_SVR:
+        return BI_CMD_STOP_SVR;
+    case BI_CMD_RC:
+        return BI_CMD_RC;
+    case BI_CMD_CD:
+        chdir(cmd->argv[1]);
+        return BI_EXECUTED;
+    default:
+        return BI_NOT_BI;
+    }
+}
+
+
+Built_In_Cmds rsh_match_command(const char *cmd) {
+    if (cmd == NULL) {
         return BI_NOT_BI;
     }
 
-    if (strcmp(cmd->argv[0], "cd") == 0) {
-        if (cmd->argc < 2) {
-            chdir(getenv("HOME"));
-        } else {
-            if (chdir(cmd->argv[1]) < 0) {
-                perror("cd");
-            }
-        }
-        return BI_EXECUTED;
-    } else if (strcmp(cmd->argv[0], "exit") == 0) {
+    if (strcmp(cmd, "cd") == 0) {
+        return BI_CMD_CD;
+    } else if (strcmp(cmd, "exit") == 0) {
         return BI_CMD_EXIT;
-    } else if (strcmp(cmd->argv[0], "stop-server") == 0) {
+    } else if (strcmp(cmd, "stop-server") == 0) {
         return BI_CMD_STOP_SVR;
+    } else if (strcmp(cmd, "rc") == 0) {
+        return BI_CMD_RC;
+    } else {
+        return BI_NOT_BI;
     }
-    return BI_NOT_BI;
 }
