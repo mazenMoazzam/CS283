@@ -121,3 +121,33 @@ EOF
     [[ "$output" == *"rw"* ]] 
     kill $server_pid
 }
+
+@test "Local execution: basic command (ls)" {
+    run ./dsh <<EOF
+ls
+EOF
+
+  
+    [ "$status" -eq 0 ] 
+    [[ "$output" == *"dsh"* ]] 
+}
+
+
+@test "Local execution: output redirection (echo > file)" {
+    run ./dsh <<EOF
+echo "Hello, World!" > /tmp/test_output.txt
+cat /tmp/test_output.txt
+EOF
+    [ "$status" -eq 0 ] 
+    [[ "$output" == *"Hello, World!"* ]] 
+    rm -f /tmp/test_output.txt
+}
+
+@test "Local execution: command with pipes (echo | grep)" {
+    run ./dsh <<EOF
+echo "Hello, World!" | grep "World"
+EOF
+
+    [ "$status" -eq 0 ] 
+    [[ "$output" == *"Hello, World!"* ]] 
+}
