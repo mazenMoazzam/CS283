@@ -188,7 +188,6 @@ int start_client(char *server_ip, int port) {
     int ret;
     cli_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (cli_socket < 0) {
-        perror("socket");
         return ERR_RDSH_CLIENT;
     }
 
@@ -196,13 +195,11 @@ int start_client(char *server_ip, int port) {
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
     if (inet_pton(AF_INET, server_ip, &addr.sin_addr) <= 0) {
-        perror("inet_pton");
         close(cli_socket);
         return ERR_RDSH_CLIENT;
     }
     ret = connect(cli_socket, (struct sockaddr *)&addr, sizeof(addr));
     if (ret < 0) {
-        perror("connect");
         close(cli_socket);
         return ERR_RDSH_CLIENT;
     }
