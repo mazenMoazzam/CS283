@@ -93,8 +93,8 @@ int exec_remote_cmd_loop(char *address, int port) {
     char *cmd_buff = NULL;
     char *rsp_buff = NULL;
     int clientSocket;
-    ssize_t io_size;
-    int is_eof;
+    ssize_t ioSize;
+    int isEOF;
 
     
     cmd_buff = malloc(RDSH_COMM_BUFF_SZ);
@@ -120,8 +120,8 @@ int exec_remote_cmd_loop(char *address, int port) {
         cmd_buff[strcspn(cmd_buff, "\n")] = '\0';
 
         
-        io_size = send(clientSocket, cmd_buff, strlen(cmd_buff) + 1, 0);
-        if (io_size < 0) {
+        ioSize = send(clientSocket, cmd_buff, strlen(cmd_buff) + 1, 0);
+        if (ioSize < 0) {
             return client_cleanup(clientSocket, cmd_buff, rsp_buff, ERR_RDSH_COMMUNICATION);
         }
 
@@ -132,24 +132,24 @@ int exec_remote_cmd_loop(char *address, int port) {
 
         
         while (1) {
-            io_size = recv(clientSocket, rsp_buff, RDSH_COMM_BUFF_SZ, 0);
-            if (io_size < 0) {
+            ioSize = recv(clientSocket, rsp_buff, RDSH_COMM_BUFF_SZ, 0);
+            if (ioSize < 0) {
                 return client_cleanup(clientSocket, cmd_buff, rsp_buff, ERR_RDSH_COMMUNICATION);
-            } else if (io_size == 0) {
+            } else if (ioSize == 0) {
                 printf(RCMD_MSG_CLIENT_EXITED);
                 return client_cleanup(clientSocket, cmd_buff, rsp_buff, OK);
             }
 
-            is_eof = (rsp_buff[io_size - 1] == RDSH_EOF_CHAR);
-            if (is_eof) {
-                rsp_buff[io_size - 1] = '\0'; 
+            isEOF = (rsp_buff[ioSize - 1] == RDSH_EOF_CHAR);
+            if (isEOF) {
+                rsp_buff[ioSize - 1] = '\0'; 
             }
 
             
-            printf("%.*s", (int)io_size, rsp_buff);
+            printf("%.*s", (int)ioSize, rsp_buff);
 
            
-            if (is_eof) {
+            if (isEOF) {
                 break;
             }
         }
