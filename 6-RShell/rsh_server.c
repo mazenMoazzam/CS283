@@ -147,27 +147,27 @@ int process_cli_requests(int svr_socket) {
  *  This function handles accepting remote client commands.
  */
 int exec_client_requests(int cli_socket) {
-    int io_size;
+    int ioSize;
     command_list_t cmd_list;
-    int rc;
-    char *io_buff;
-    io_buff = malloc(RDSH_COMM_BUFF_SZ);
-    if (!io_buff) {
+    int returnCode;
+    char *ioBuffSize;
+    ioBuffSize = malloc(RDSH_COMM_BUFF_SZ);
+    if (!ioBuffSize) {
         return ERR_RDSH_SERVER;
     }
 
     while (1) {
-        io_size = recv(cli_socket, io_buff, RDSH_COMM_BUFF_SZ, 0);
-        if (io_size < 0) {
-            free(io_buff);
+        ioSize = recv(cli_socket, ioBuffSize, RDSH_COMM_BUFF_SZ, 0);
+        if (ioSize < 0) {
+            free(ioBuffSize);
             return ERR_RDSH_COMMUNICATION;
-        } else if (io_size == 0) {
-            free(io_buff);
+        } else if (ioSize == 0) {
+            free(ioBuffSize);
             return OK;
         }
-        io_buff[io_size] = '\0';
-        rc = build_cmd_list(io_buff, &cmd_list);
-        if (rc < 0) {
+        ioBuffSize[ioSize] = '\0';
+        returnCode = build_cmd_list(ioBuffSize, &cmd_list);
+        if (returnCode < 0) {
             send_message_string(cli_socket, CMD_ERR_RDSH_EXEC);
             send_message_eof(cli_socket);
             continue;
@@ -176,11 +176,11 @@ int exec_client_requests(int cli_socket) {
         
         Built_In_Cmds bi_cmd = rsh_built_in_cmd(&cmd_list.commands[0]);
         if (bi_cmd == BI_CMD_EXIT) {
-            free(io_buff);
+            free(ioBuffSize);
             return OK;
         } else if (bi_cmd == BI_CMD_STOP_SVR) {
             
-            free(io_buff);
+            free(ioBuffSize);
             return OK_EXIT;
         } else if (bi_cmd == BI_EXECUTED) {
           
@@ -189,23 +189,23 @@ int exec_client_requests(int cli_socket) {
         }
 
         
-        rc = rsh_execute_pipeline(cli_socket, &cmd_list);
-        if (rc < 0) {
+        returnCode = rsh_execute_pipeline(cli_socket, &cmd_list);
+        if (returnCode < 0) {
            
             send_message_string(cli_socket, CMD_ERR_RDSH_EXEC);
         }
 
         
-        rc = send_message_eof(cli_socket);
-        if (rc != OK) {
+        returnCode = send_message_eof(cli_socket);
+        if (returnCode != OK) {
             printf(CMD_ERR_RDSH_COMM);
-            free(io_buff);
+            free(ioBuffSize);
             close(cli_socket);
             return ERR_RDSH_COMMUNICATION;
         }
     }
 
-    free(io_buff);
+    free(ioBuffSize);
     return OK;
 }
 
