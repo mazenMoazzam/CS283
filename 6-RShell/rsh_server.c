@@ -72,18 +72,18 @@ int stop_server(int svr_socket) {
  *      socket operations prior to accepting client connections.  
  */
 int boot_server(char *ifaces, int port) {
-    int svr_socket;
-    int ret;
+    int serverSocket;
+    int returnStatusCode;
     struct sockaddr_in addr;
-    svr_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (svr_socket < 0) {
+    serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+    if (serverSocket < 0) {
         return ERR_RDSH_COMMUNICATION;
     }
 
    
     int enable = 1;
-    if (setsockopt(svr_socket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
-        close(svr_socket);
+    if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
+        close(serverSocket);
         return ERR_RDSH_COMMUNICATION;
     }
 
@@ -92,23 +92,23 @@ int boot_server(char *ifaces, int port) {
     addr.sin_port = htons(port);
 
     if (inet_pton(AF_INET, ifaces, &addr.sin_addr) <= 0) {
-        close(svr_socket);
+        close(serverSocket);
         return ERR_RDSH_COMMUNICATION;
     }
 
-    ret = bind(svr_socket, (struct sockaddr *)&addr, sizeof(addr));
-    if (ret < 0) {
-        close(svr_socket);
+    returnStatusCode = bind(serverSocket, (struct sockaddr *)&addr, sizeof(addr));
+    if (returnStatusCode < 0) {
+        close(serverSocket);
         return ERR_RDSH_COMMUNICATION;
     }
     
-    ret = listen(svr_socket, 20);
-    if (ret < 0) {
-        close(svr_socket);
+    returnStatusCode = listen(serverSocket, 20);
+    if (returnStatusCode < 0) {
+        close(serverSocket);
         return ERR_RDSH_COMMUNICATION;
     }
 
-    return svr_socket;
+    return serverSocket;
 }
 
 /*
@@ -118,26 +118,26 @@ int boot_server(char *ifaces, int port) {
  *  This function handles managing client connections.
  */
 int process_cli_requests(int svr_socket) {
-    int cli_socket;
+    int clientSocket;
     struct sockaddr_in cli_addr;
     socklen_t cli_len = sizeof(cli_addr);
-    int rc = OK;
+    int statusReturnCode = OK;
 
     while (1) {
 
-        cli_socket = accept(svr_socket, (struct sockaddr *)&cli_addr, &cli_len);
-        if (cli_socket < 0) {
+        clientSocket = accept(svr_socket, (struct sockaddr *)&cli_addr, &cli_len);
+        if (clientSocket < 0) {
             return ERR_RDSH_COMMUNICATION;
         }
-        rc = exec_client_requests(cli_socket);
-        if (rc == OK_EXIT) {
-            close(cli_socket);
+        statusReturnCode = exec_client_requests(clientSocket);
+        if (statusReturnCode == OK_EXIT) {
+            close(clientSocket);
             break;
         }
-        close(cli_socket);
+        close(clientSocket);
     }
 
-    return rc;
+    return statusReturnCode;
 }
 
 /*
